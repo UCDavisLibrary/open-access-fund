@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_PASSWORD: localhost
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ../../../services/pg/schema:/docker-entrypoint-initdb.d
+  adminer:
+    image: adminer:5
+    ports:
+      - ${ADMINER_HOST_PORT:-8080}:8080
+volumes:
+  db-data:
