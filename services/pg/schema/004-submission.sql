@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS submission (
   author_middle_initial TEXT,
   other_authors TEXT,
   author_affiliation TEXT,
+  author_affiliation_other TEXT,
   author_department TEXT,
   author_email TEXT NOT NULL,
   author_phone TEXT,
@@ -38,6 +39,16 @@ ALTER TABLE submission
   DROP COLUMN IF EXISTS financial_contact_full_name,
   ADD COLUMN financial_contact_full_name text GENERATED ALWAYS AS (
     make_full_name(financial_contact_first_name, NULL, financial_contact_last_name) COLLATE "C"
+  ) STORED;
+
+ALTER TABLE submission
+  DROP COLUMN IF EXISTS author_affiliation_combined,
+  ADD COLUMN author_affiliation_combined text generated always as (
+    CASE
+      WHEN author_affiliation = 'other' AND author_affiliation_other IS NOT NULL
+        THEN author_affiliation_other
+      ELSE author_affiliation
+    END
   ) STORED;
 
 CREATE OR REPLACE TRIGGER submission_updated_at

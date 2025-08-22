@@ -1,0 +1,16 @@
+{
+  "name": "open-access-fund-base-image",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "spelkey@ucdavis.edu",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "migrate": "node ./migration/index.js"
+  },
+  "dependencies": {
+    "@ucd-lib/logger": "^0.0.7",
+    "mysql2": "^3.14.3"
+  }
+}
