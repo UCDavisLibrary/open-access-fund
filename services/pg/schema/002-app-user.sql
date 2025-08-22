@@ -8,6 +8,12 @@ CREATE TABLE IF NOT EXISTS app_user (
   updated_at timestamp NOT NULL DEFAULT now()
 );
 
+ALTER TABLE app_user
+  DROP COLUMN IF EXISTS full_name,
+  ADD COLUMN full_name text GENERATED ALWAYS AS (
+    make_full_name(first_name, NULL, last_name) COLLATE "C"
+  ) STORED;
+
 CREATE OR REPLACE TRIGGER app_user_updated_at
   BEFORE UPDATE ON app_user
   FOR EACH ROW
