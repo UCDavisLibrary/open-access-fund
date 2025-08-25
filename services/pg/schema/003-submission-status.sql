@@ -17,16 +17,17 @@ CREATE OR REPLACE TRIGGER submission_status_updated_at
 CREATE OR REPLACE FUNCTION get_submission_status_id(name_or_id TEXT)
 RETURNS UUID AS $$
   DECLARE
-    status_id UUID;
+    status_id_v UUID;
   BEGIN
-    SELECT status_id INTO status_id FROM submission_status
+    SELECT status_id INTO status_id_v FROM submission_status
     WHERE name = name_or_id OR status_id = try_cast_uuid(name_or_id);
-    IF status_id IS NULL THEN
+    IF status_id_v IS NULL THEN
       RAISE EXCEPTION 'Submission status not found: %', name_or_id;
     END IF;
-    RETURN status_id;
+    RETURN status_id_v;
   END;
 $$ LANGUAGE plpgsql;
+
 
 INSERT INTO submission_status (name, label, submission_active, submission_successful)
   SELECT

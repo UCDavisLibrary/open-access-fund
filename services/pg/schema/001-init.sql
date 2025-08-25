@@ -28,10 +28,9 @@ CREATE OR REPLACE FUNCTION make_full_name(first text, middle text, last text)
 RETURNS text
 LANGUAGE sql
 IMMUTABLE
-RETURNS NULL ON NULL INPUT
 AS $$
-  SELECT
-    coalesce(first, '') ||
-    CASE WHEN middle IS NOT NULL AND length(middle) > 0 THEN ' ' || middle ELSE '' END ||
-    CASE WHEN last   IS NOT NULL AND length(last)   > 0 THEN ' ' || last   ELSE '' END
+  SELECT btrim(concat_ws(' ',
+                         NULLIF(first, ''),
+                         NULLIF(middle, ''),
+                         NULLIF(last, '')))
 $$;

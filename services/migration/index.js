@@ -1,4 +1,7 @@
 import mysql from 'mysql2/promise';
+import pgClient from '../lib/utils/pgClient.js';
+import he from "he";
+import models from '../lib/models/index.js';
 
 import fundAccountUtils from '../lib/utils/fundAccountUtils.js';
 
@@ -25,12 +28,18 @@ class Migration {
 
     for (const app of bigsysData) {
       const submission = this.transformSubmission(app);
-      console.log(submission);
+      //console.log(submission);
+      const result = await models.submission.create(submission);
+      if ( result.error ) {
+        console.error(`Error writing submission for bigsys application id ${app.id}`);
+        throw result.error;
+      }
     }
 
     await this.writeWarnings();
     this.printWarningCounts();
     pool.end();
+    pgClient.pool.end();
   }
 
   addWarning(appId, warning){
@@ -45,6 +54,7 @@ class Migration {
   transformSubmission(bigsysApp){
 
     const submission = {
+      'bigsys_id': bigsysApp.id,
       'submitted_at': bigsysApp.submit_date,
       'author_last_name': this.convertStringField(bigsysApp, 'author_last'),
       'author_first_name': this.convertStringField(bigsysApp, 'author_first'),
@@ -56,6 +66,13 @@ class Migration {
       'financial_contact_email': this.convertStringField(bigsysApp, 'contact_email'),
       'financial_contact_phone': this.convertStringField(bigsysApp, 'contact_phone'),
       'fund_account': { bigsysValue: bigsysApp.fund_account },
+      'requested_amount': this.convertNumberField(bigsysApp, 'fund_amount'),
+      'article_title': he.decode(this.convertStringField(bigsysApp, 'article_title')),
+      'article_journal': he.decode(this.convertStringField(bigsysApp, 'article_journal')),
+      'article_publisher': he.decode(this.convertStringField(bigsysApp, 'article_publisher')),
+      'article_link': bigsysApp.article_link,
+      'award_amount': bigsysApp.award_amount,
+      'accounting_system_number': bigsysApp.kfs_number
     };
 
     // split out author affiliation
@@ -121,6 +138,28 @@ class Migration {
 
     // parse fund account
     if ( bigsysApp.fund_account?.trim?.() ) {
+      const fundAccountString = bigsysApp.fund_account.replace('(POET)', '').replace('(GL)', '').trim();
+      try {
+        fundAccountUtils.parse(fundAccountString);
+      } catch (error) {
+        this.addWarning(bigsysApp.id, {
+          type: 'INVALID_FUND_ACCOUNT',
+          field: 'fund_account',
+          message: error.message,
+          bigsysValue: bigsysApp.fund_account
+        });
+      }
+      submission.fund_account.fundType = fundAccountUtils.fundType;
+      submission.fund_account.parts = fundAccountUtils.fundAccountParts;
+      const validation = fundAccountUtils.validate();
+      if ( !validation.valid ) {
+        this.addWarning(bigsysApp.id, {
+          type: 'FUND_ACCOUNT_VALIDATION_ERRORS',
+          field: 'fund_account',
+          errors: validation.errors,
+          bigsysValue: bigsysApp.fund_account
+        });
+      }
 
     } else {
       this.addWarning(bigsysApp.id, {
@@ -128,6 +167,28 @@ class Migration {
         field: 'fund_account'
       });
     }
+
+    // article status
+    const articleStatusMap = {
+      'In Preparation': 'in-preparation',
+      'Submitted': 'submitted',
+      'Accepted': 'accepted',
+      'Past 6-Months': 'past-6-months'
+    };
+    submission.article_status = articleStatusMap[bigsysApp.article_status] || 'other';
+
+    // map status
+    // uuid is set by a pg trigger on insert
+    const statusMap = {
+      "Approved": "completed",
+      "Denied": "denied",
+      "Deleted": "deleted",
+      "Pending": "pending",
+      "Accounting": "accounting",
+      "Submitted": "submitted",
+      "Withdrawn": "withdrawn"
+    };
+    submission.submission_status_id = statusMap[bigsysApp.award_status];
 
     return submission;
   }
@@ -143,12 +204,23 @@ class Migration {
     return app[fieldName].trim();
   }
 
+  convertNumberField(app, fieldName){
+    if ( app[fieldName] == null || isNaN(app[fieldName]) ) {
+      this.addWarning(app.id, {
+        type: `MISSING_OR_INVALID_${fieldName.toUpperCase()}`,
+        field: fieldName
+      });
+      return null;
+    }
+    return app[fieldName];
+  }
+
   /**
    * @description Get data from bigsys database
    * @returns
    */
   async getBigsysData(opts={}) {
-    let [applications = rows ] = await pool.query('SELECT * FROM applications');
+    let [applications = rows ] = await pool.query('SELECT * FROM applications WHERE award_status != \'Deleted\' ORDER BY id DESC');
     const [applicationsHistory = rows ] = await pool.query('SELECT * FROM applications_history');
 
     for (const app of applications) {
@@ -200,4 +272,5 @@ class Migration {
 
 const migration = new Migration();
 
-await migration.run({limit: 1});
+await migration.run({limit: 2});
+//await migration.run();

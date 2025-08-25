@@ -19,12 +19,13 @@ CREATE TABLE IF NOT EXISTS submission (
   article_title TEXT NOT NULL,
   article_journal TEXT NOT NULL,
   article_status TEXT NOT NULL,
-  article_publisher TEXT NOT NULL,
+  article_publisher TEXT,
   article_link TEXT,
   submission_status_id UUID NOT NULL REFERENCES submission_status(status_id) ON DELETE RESTRICT,
   award_amount NUMERIC(10, 2),
   accounting_system_number TEXT,
   tsv_content tsvector,
+  bigsys_id INTEGER,
   created_at timestamp NOT NULL DEFAULT now(),
   updated_at timestamp NOT NULL DEFAULT now()
 );
@@ -56,19 +57,20 @@ CREATE OR REPLACE TRIGGER submission_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION set_updated_at();
 
+-- Full text search index
 ALTER TABLE submission
   DROP COLUMN IF EXISTS tsv_content,
   ADD COLUMN tsv_content tsvector GENERATED ALWAYS AS (
-    setweight(to_tsvector('simple', unaccent(
+    setweight(to_tsvector('simple',
       make_full_name(author_first_name, author_middle_initial, author_last_name) COLLATE "C"
-    )), 'A') ||
+    ), 'A') ||
     setweight(to_tsvector('simple', lower(coalesce(author_email,''))), 'A') ||
-    setweight(to_tsvector('simple', unaccent(
+    setweight(to_tsvector('simple',
       make_full_name(financial_contact_first_name, NULL, financial_contact_last_name) COLLATE "C"
-    )), 'A') ||
+    ), 'A') ||
     setweight(to_tsvector('simple', lower(coalesce(financial_contact_email,''))), 'A') ||
     setweight(to_tsvector('english', coalesce(article_title,'')), 'A') ||
-    setweight(to_tsvector('english', unaccent(coalesce(other_authors,''))), 'B') ||
+    setweight(to_tsvector('english', coalesce(other_authors,'')), 'B') ||
     setweight(to_tsvector('english', coalesce(author_department,'')), 'B') ||
     setweight(to_tsvector('english', coalesce(article_journal,'')), 'B') ||
     setweight(to_tsvector('english', coalesce(article_publisher,'')), 'B')
