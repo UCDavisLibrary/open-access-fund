@@ -17,7 +17,10 @@ language plpgsql;
 CREATE OR REPLACE FUNCTION set_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
-    NEW.updated_at = now();
+    -- Only set updated_at if it wasn't explicitly set in the UPDATE
+    IF NEW.updated_at IS NULL OR NEW.updated_at = OLD.updated_at THEN
+        NEW.updated_at := now();
+    END IF;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;

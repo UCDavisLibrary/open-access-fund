@@ -1,6 +1,5 @@
 CREATE TABLE IF NOT EXISTS submission (
   submission_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  submitted_at timestamp NOT NULL DEFAULT now(),
   author_last_name TEXT NOT NULL,
   author_first_name TEXT NOT NULL,
   author_middle_initial TEXT,

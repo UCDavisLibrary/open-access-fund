@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS submission_transaction (
   app_user_id UUID REFERENCES app_user(app_user_id) ON DELETE SET NULL,
   transaction_type TEXT NOT NULL,
   transaction_subtype TEXT,
+  previous_status TEXT,
   user_comment_id UUID REFERENCES user_comment(user_comment_id) ON DELETE SET NULL,
   details JSONB DEFAULT '{}'::jsonb,
   created_at timestamp NOT NULL DEFAULT now()

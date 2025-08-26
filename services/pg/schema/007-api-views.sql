@@ -3,7 +3,6 @@ select
   s.submission_id,
   jsonb_build_object(
     'submissionId', s.submission_id,
-    'submittedAt', s.submitted_at,
     'authorLastName', s.author_last_name,
     'authorFirstName', s.author_first_name,
     'authorMiddleInitial', s.author_middle_initial,
@@ -82,6 +81,7 @@ select
                       'transactionId',       t.transaction_id,
                       'transactionType',     t.transaction_type,
                       'transactionSubtype',  t.transaction_subtype,
+                      'previousStatus',      t.previous_status,
                       'userComment',
                         case when tuc.user_comment_id is null then null else jsonb_build_object(
                           'userCommentId', tuc.user_comment_id,

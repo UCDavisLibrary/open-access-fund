@@ -27,12 +27,57 @@ class Migration {
     console.log(`Got ${bigsysData.length} applications from bigsys`);
 
     for (const app of bigsysData) {
+
+      // write submission
       const submission = this.transformSubmission(app);
-      //console.log(submission);
       const result = await models.submission.create(submission);
       if ( result.error ) {
         console.error(`Error writing submission for bigsys application id ${app.id}`);
         throw result.error;
+      }
+
+      // library comment
+      const libraryComments = app.library_notes?.trim();
+      if ( libraryComments ) {
+        const commentResult = await models.userComment.create({
+          submission_id: result.res.submissionId,
+          comment_text: libraryComments
+        });
+        if ( commentResult.error ) {
+          console.error(`Error writing library comment for bigsys application id ${app.id}`);
+          throw commentResult.error;
+        }
+      }
+
+      // status update transactions
+      if ( app.sent_to_accounting ){
+        const transactionData = {
+          submission_id: result.res.submissionId,
+          transaction_type: 'status-update',
+          transaction_subtype: 'accounting',
+          created_at: app.sent_to_accounting
+        };
+
+        const transactionResult = await models.submissionTransaction.create(transactionData);
+        if ( transactionResult.error ) {
+          console.error(`Error sent to accounting transaction for bigsys application id ${app.id}`);
+          throw transactionResult.error;
+        }
+      }
+
+      if ( app.payment_made ){
+        const transactionData = {
+          submission_id: result.res.submissionId,
+          transaction_type: 'status-update',
+          transaction_subtype: 'completed',
+          created_at: app.payment_made
+        };
+
+        const transactionResult = await models.submissionTransaction.create(transactionData);
+        if ( transactionResult.error ) {
+          console.error(`Error payment made transaction for bigsys application id ${app.id}`);
+          throw transactionResult.error;
+        }
       }
     }
 
@@ -55,7 +100,8 @@ class Migration {
 
     const submission = {
       'bigsys_id': bigsysApp.id,
-      'submitted_at': bigsysApp.submit_date,
+      'created_at': bigsysApp.submit_date,
+      'updated_at': bigsysApp.submit_date,
       'author_last_name': this.convertStringField(bigsysApp, 'author_last'),
       'author_first_name': this.convertStringField(bigsysApp, 'author_first'),
       'author_middle_initial': bigsysApp.author_mi,
@@ -211,7 +257,7 @@ class Migration {
         type: `MISSING_OR_INVALID_${fieldName.toUpperCase()}`,
         field: fieldName
       });
-      return null;
+      return 0;
     }
     return app[fieldName];
   }
@@ -273,5 +319,5 @@ class Migration {
 
 const migration = new Migration();
 
-await migration.run({limit: 10});
-//await migration.run();
+//await migration.run({limit: 10});
+await migration.run();

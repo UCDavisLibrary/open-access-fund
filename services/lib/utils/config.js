@@ -3,7 +3,9 @@ class Config {
     this.db = {
       tables: {
         submission: 'submission',
-        submissionStatus: 'submission_status'
+        submissionStatus: 'submission_status',
+        userComment: 'user_comment',
+        submissionTransaction: 'submission_transaction'
       }
     }
   }
