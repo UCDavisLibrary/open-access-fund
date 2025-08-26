@@ -4,28 +4,6 @@ class Config {
       tables: {
         submission: 'submission',
         submissionStatus: 'submission_status'
-      },
-      // fields that can be set by user
-      userFields: {
-        submission: [
-          'author_last_name',
-          'author_first_name',
-          'author_middle_initial',
-          'other_authors',
-          'author_department',
-          'author_email',
-          'author_phone',
-          'financial_contact_email',
-          'financial_contact_phone',
-          'fund_account',
-          'requested_amount',
-          'article_title',
-          'article_journal',
-          'article_publisher',
-          'article_link',
-          'award_amount',
-          'accounting_system_number'
-        ]
       }
     }
   }

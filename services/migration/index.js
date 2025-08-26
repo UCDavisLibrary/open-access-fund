@@ -72,7 +72,8 @@ class Migration {
       'article_publisher': he.decode(this.convertStringField(bigsysApp, 'article_publisher')),
       'article_link': bigsysApp.article_link,
       'award_amount': bigsysApp.award_amount,
-      'accounting_system_number': bigsysApp.kfs_number
+      'accounting_system_number': bigsysApp.kfs_number,
+      'author_comment': bigsysApp.comments
     };
 
     // split out author affiliation
@@ -272,5 +273,5 @@ class Migration {
 
 const migration = new Migration();
 
-await migration.run({limit: 2});
+await migration.run({limit: 10});
 //await migration.run();
