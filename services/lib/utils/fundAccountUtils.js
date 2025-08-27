@@ -17,12 +17,12 @@ class FundAccountUtils {
         implode: (...args) => this._implodeGlString(...args),
         test: (...args) => this._isGlType(...args),
         constants: ['13U00', '775B15', '80'],
-        validations: [
-          {part: 'entity', required: true, length: 4},
-          {part: 'department', required: true, length: 7},
-          {part: 'program', length: 3},
-          {part: 'project', length: 10},
-          {part: 'activity', length: 6}
+        components: [
+          {value: 'entity', label: 'Entity', required: true, length: 4},
+          {value: 'department', label: 'Department', required: true, length: 7},
+          {value: 'program', label: 'Program', length: 3},
+          {value: 'project', label: 'Project', length: 10},
+          {value: 'activity', label: 'Activity', length: 6}
         ]
       },
       {
@@ -32,10 +32,10 @@ class FundAccountUtils {
         implode: (...args) => this._implodePoetString(...args),
         test: (...args) => this._isPoetType(...args),
         constants: ['775B15'],
-        validations: [
-          {part: 'project', length: 10},
-          {part: 'organization', required: true, length: 7},
-          {part: 'task', required: true, length: 6}
+        components: [
+          {value: 'project', label: 'Project', length: 10},
+          {value: 'organization', label: 'Organization', required: true, length: 7},
+          {value: 'task', label: 'Task', required: true, length: 6}
         ]
       }
     ];
@@ -86,12 +86,12 @@ class FundAccountUtils {
       parts = this.explode(fundAccountStringOrParts, fundType);
     }
     const errors = [];
-    for ( const part of registryItem.validations ) {
+    for ( const part of registryItem.components ) {
       const error = {};
-      if ( part.required && !parts[part.part] ) {
+      if ( part.required && !parts[part.value] ) {
         error.missingError = true;
       }
-      if ( part.length && parts[part.part] && parts[part.part].length !== part.length ) {
+      if ( part.length && parts[part.value] && parts[part.value].length !== part.length ) {
         error.lengthError = true;
       }
       if ( Object.keys(error).length ) {

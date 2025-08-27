@@ -3,3 +3,4 @@ node_modules
 .DS_Store
 secrets
 /services/migration/data
+/services/client/dev/public/js

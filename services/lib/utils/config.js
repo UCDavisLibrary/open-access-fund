@@ -1,5 +1,18 @@
 class Config {
   constructor(){
+
+    this.adminApp = {
+      env: this._getEnv('ADMIN_APP_ENV').value === 'dev' ? 'dev' : 'prod',
+      title: this._getEnv('ADMIN_APP_TITLE', 'UC Davis Open Access Fund Administration'),
+      routes: this._getEnv('ADMIN_APP_ROUTES', [], false, true),
+      ports: {
+        host: this._getEnv('ADMIN_APP_HOST_PORT', 3000),
+        container: this._getEnv('ADMIN_APP_CONTAINER_PORT', 3000)
+      },
+      bundleName: this._getEnv('ADMIN_APP_BUNDLE_NAME', 'open-access-fund.js')
+    }
+
+
     this.db = {
       tables: {
         submission: 'submission',
@@ -27,12 +40,10 @@ class Config {
    * @returns {Object} - Returns the merged configuration object.
    */
   makeAppConfig(config={}){
-    config.title = this.app.title.value;
-    config.routes = this.app.routes.value;
-    config.logger = {
-      logLevel: this.app.logger.logLevel.value
-    };
-    config[this.postgrest.host.name] = this.postgrest.host.value;
+
+    config.title = this.adminApp.title.value;
+    config.routes = this.adminApp.routes.value;
+
     return config;
   }
 

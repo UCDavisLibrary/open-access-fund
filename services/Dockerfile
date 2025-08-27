@@ -39,13 +39,18 @@ WORKDIR /app/deploy-utils
 RUN mkdir /services
 WORKDIR /services
 
+# Install app dependencies
 COPY services/package.json .
-# COPY services/package-lock.json .
+COPY services/package-lock.json .
+RUN npm install
 
-# COPY services/lib ./lib
+# Copy app source code
+COPY services/lib ./lib
 COPY services/pg ./pg
 COPY services/migration ./migration
+COPY services/client ./client
 
-RUN npm install
+# Build the client
+RUN npm run client-build-dist && npm run client-build-dev
 
 CMD ["bash", "-c", "tail -f /dev/null"]

@@ -4,10 +4,6 @@ import config from '../utils/config.js';
 class SubmissionTransaction {
 
   async create(data, client){
-    // const excludeFields = ['transaction_id'];
-    // const d = pgClient.prepareObjectForInsert(data, { excludeFields });
-    // const sql = `INSERT INTO ${config.db.tables.submissionTransaction} (${d.keysString}) VALUES (${d.placeholdersString}) RETURNING transaction_id`;
-
     let values = [
       data.submission_id,
       data.transaction_type,

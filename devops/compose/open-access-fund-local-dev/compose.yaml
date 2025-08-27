@@ -1,6 +1,33 @@
 x-variables:
   main-image: &main-image localhost/local-dev/open-access-fund:local-dev
 services:
+  admin-app:
+    image: *main-image
+    env_file:
+      - .env
+    environment:
+      ADMIN_APP_ENV: 'dev'
+      PGUSER: 'postgres'
+      PGHOST: 'db'
+      PGDATABASE: 'postgres'
+      PGPASSWORD: 'localhost'
+      PGPORT: 5432
+    volumes:
+      - ../../../services:/services
+      - /services/node_modules
+    depends_on:
+      - db
+    ports:
+      - ${ADMIN_APP_HOST_PORT:-3000}:${ADMIN_APP_CONTAINER_PORT:-3000}
+  submission-dev:
+    image: *main-image
+    env_file:
+      - .env
+    volumes:
+      - ../../../services/client/submission-dev:/services/client/submission-dev
+    ports:
+      - ${SUBMISSION_DEV_HOST_PORT:-3001}:8080
+    command: ["npm", "run", "start-submission-dev"]
   db:
     image: postgres:17
     environment:
