@@ -7,6 +7,7 @@ services:
       - .env
     environment:
       ADMIN_APP_ENV: 'dev'
+      GOOGLE_APPLICATION_CREDENTIALS: /etc/gc-service-account.json
       PGUSER: 'postgres'
       PGHOST: 'db'
       PGDATABASE: 'postgres'
@@ -15,6 +16,7 @@ services:
     volumes:
       - ../../../services:/services
       - /services/node_modules
+      - ../../../secrets/gc-reader-key.json:/etc/gc-service-account.json
     depends_on:
       - db
     ports:

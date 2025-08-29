@@ -9,7 +9,8 @@ class Config {
         host: this._getEnv('ADMIN_APP_HOST_PORT', 3000),
         container: this._getEnv('ADMIN_APP_CONTAINER_PORT', 3000)
       },
-      bundleName: this._getEnv('ADMIN_APP_BUNDLE_NAME', 'open-access-fund.js')
+      bundleName: this._getEnv('ADMIN_APP_BUNDLE_NAME', 'open-access-fund.js'),
+      host: this._getEnv('ADMIN_APP_HOST'),
     }
 
 
@@ -20,6 +21,22 @@ class Config {
         userComment: 'user_comment',
         submissionTransaction: 'submission_transaction'
       }
+    }
+
+    this.api = {
+      root: this._getEnv('API_ROOT', '/api'),
+    }
+
+    this.recaptcha = {
+      key: this._getEnv('RECAPTCHA_KEY'),
+      disabled: this._getEnv('RECAPTCHA_DISABLED', false),
+      submissionAction: this._getEnv('RECAPTCHA_SUBMISSION_ACTION', 'submit_oaf_form'),
+      projectId: this._getEnv('RECAPTCHA_PROJECT_ID', 'digital-ucdavis-edu'),
+      scoreThreshold: this._getEnv('RECAPTCHA_SCORE_THRESHOLD', 0.5)
+    }
+
+    this.logger = {
+      name: this._getEnv('LOGGER_NAME', 'open-access-fund')
     }
   }
 
@@ -32,6 +49,21 @@ class Config {
       return window.APP_CONFIG;
     }
     return {};
+  }
+
+  /**
+   * @description Set the ADMIN_APP_HOST from the script tag in the document
+   * Critical for cork model functionality when doing cross-origin hosting of the submission form
+   */
+  setAdminAppHostFromDocument(){
+    if (typeof document !== 'undefined') {
+      const script = document.querySelector('script[src*="open-access-fund.js"]');
+      if ( !script ){
+        console.warn('Could not find script tag for open-access-fund.js to set ADMIN_APP_HOST');
+      }
+      const url = new URL(script.src);
+      this.adminApp.host.value = url.origin;
+    }
   }
 
   /**

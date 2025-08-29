@@ -15,6 +15,7 @@
     "client-build-dist": "cd ./client/build && webpack --config webpack-dist.config.js"
   },
   "dependencies": {
+    "@google-cloud/recaptcha-enterprise": "^6.3.0",
     "@ucd-lib/cork-app-build": "^0.5.0",
     "@ucd-lib/cork-app-state": "^3.0.1",
     "@ucd-lib/cork-app-utils": "^6.3.1",

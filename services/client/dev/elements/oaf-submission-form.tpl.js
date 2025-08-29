@@ -1,4 +1,5 @@
 import { html, css } from 'lit';
+import { when } from 'lit/directives/when.js';
 
 // styles from ucdlib theme
 import normalizeStyles from "@ucd-lib/theme-sass/normalize.css.js";
@@ -10,6 +11,9 @@ import buttonStyles from "@ucd-lib/theme-sass/2_base_class/_buttons.css.js";
 import { DataDefinitions } from '../../../lib/utils/DataDefinitions.js';
 import fundAccountUtils from '../../../lib/utils/fundAccountUtils.js';
 import IdGenerator from '../utils/IdGenerator.js';
+
+import '../components/cork-character-tracker.js';
+
 const idGen = new IdGenerator();
 
 export function styles() {
@@ -86,9 +90,19 @@ export function render() {
   return html`
     <div class='container'>
       <form @submit=${this._onSubmit} novalidate>
+        <div>Fields marked with * are required</div>
         ${_renderAuthorInfo.call(this)}
         ${_renderFinancialContactInfo.call(this)}
         ${_renderFinanceAccountInfo.call(this)}
+        ${_renderArticleInfo.call(this)}
+        <div class='field-container'>
+          <label for=${idGen.get('authorComment')}>Additional Comments</label>
+          <textarea
+            id=${idGen.get('authorComment')}
+            rows='4'
+            .value=${this.payload.authorComment || ''}
+            @input=${e => this._onInput('authorComment', e.target.value)}></textarea>
+        </div>
         <button type='submit' class='btn btn--primary'>Submit</button>
       </form>
     </div>
@@ -273,6 +287,14 @@ function _renderFinanceAccountInfo(){
               id=${idGen.get(`${this.selectedFundType.value}-${fundComponent.value}`)}
               .value=${this.payload.fundAccount?.parts?.[fundComponent.value] || ''}
               @input=${e => this._onFundPartInput(fundComponent.value, e.target.value)}>
+            ${when(fundComponent.length, () => html`
+              <cork-character-tracker
+                character-count=${this.payload.fundAccount?.parts?.[fundComponent.value]?.length}
+                max-characters=${fundComponent.length}
+                exact-match
+                show-if-empty
+              ></cork-character-tracker>
+            `)}
           </div>
           `)}
       </fieldset>
@@ -285,9 +307,67 @@ function _renderFinanceAccountInfo(){
           max='1000'
           type=number
           @input=${e => this._onInput('requestedAmount', e.target.value)}>
+        <div>Max amount: $1000</div>
       </div>
+    </fieldset>
+  `;
+}
 
-
+function _renderArticleInfo(){
+  return html`
+    <fieldset>
+      <legend>Article Information</legend>
+      <div class='field-container'>
+        <label for=${idGen.get('articleTitle')}>Article Title <span class='required'>*</span></label>
+        <input
+          id=${idGen.get('articleTitle')}
+          type='text'
+          required
+          .value=${this.payload.articleTitle || ''}
+          @input=${e => this._onInput('articleTitle', e.target.value)}>
+      </div>
+      <div class='field-container'>
+        <label for=${idGen.get('articleJournal')}>Journal Name <span class='required'>*</span></label>
+        <input
+          id=${idGen.get('articleJournal')}
+          type='text'
+          required
+          .value=${this.payload.articleJournal || ''}
+          @input=${e => this._onInput('articleJournal', e.target.value)}>
+      </div>
+      <div class='field-container'>
+        <label for=${idGen.get('articlePublisher')}>Publisher</label>
+        <input
+          id=${idGen.get('articlePublisher')}
+          type='text'
+          .value=${this.payload.articlePublisher || ''}
+          @input=${e => this._onInput('articlePublisher', e.target.value)}>
+      </div>
+      <fieldset class='fieldset--group radio'>
+        <legend>Publication Status <span class='required'>*</span></legend>
+        <ul class="list--reset">
+          ${DataDefinitions.ARTICLE_STATUSES.map(status => html`
+            <li>
+              <input
+                type='radio'
+                id='${idGen.get('articleStatus-' + status.value)}'
+                name=${idGen.get('articleStatus')}
+                required
+                .checked=${this.payload.articleStatus === status.value}
+                @change=${e => this._onInput('articleStatus', status.value)}>
+              <label for='${idGen.get('articleStatus-' + status.value)}'>${status.label}</label>
+            </li>
+          `)}
+        </ul>
+      </fieldset>
+      <div class='field-container'>
+        <label for=${idGen.get('articleLink')}>URL for Article</label>
+        <input
+          id=${idGen.get('articleLink')}
+          type='text'
+          .value=${this.payload.articleLink || ''}
+          @input=${e => this._onInput('articleLink', e.target.value)}>
+      </div>
     </fieldset>
   `;
 }
