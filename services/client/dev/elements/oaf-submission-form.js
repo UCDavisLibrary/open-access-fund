@@ -17,7 +17,8 @@ export default class OafSubmissionForm extends Mixin(LitElement)
   static get properties() {
     return {
       payload: {type: Object},
-      selectedFundType: { type: Object }
+      selectedFundType: { type: Object },
+      _submitting: { state: true }
     }
   }
 
@@ -30,6 +31,7 @@ export default class OafSubmissionForm extends Mixin(LitElement)
     this.render = render.bind(this);
     this.payload = {};
     this.selectedFundType = null;
+    this._submitting = false;
 
     config.setAdminAppHostFromDocument();
 
@@ -44,13 +46,15 @@ export default class OafSubmissionForm extends Mixin(LitElement)
 
   }
 
-  _onSubmit(e){
+  async _onSubmit(e){
     e.preventDefault();
-    this.submit();
+    if ( this._submitting ) return;
+    this._submitting = true;
+    const r = await this.submit();
+    this._submitting = false;
   }
 
   async submit(){
-
     const payload = JSON.parse(JSON.stringify(this.payload));
     if ( !recaptcha.config.disabled ) {
       payload.recaptchaToken = await recaptcha.execute();

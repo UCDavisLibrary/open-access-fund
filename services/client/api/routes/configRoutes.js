@@ -1,4 +1,4 @@
-import config from '../../lib/utils/config.js';
+import config from '../../../lib/utils/config.js';
 
 export default (app) => {
   app.get('/config/recaptcha', async (req, res) => {

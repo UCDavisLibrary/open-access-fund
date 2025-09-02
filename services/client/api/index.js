@@ -1,7 +1,7 @@
 import express from 'express';
 import config from '../../lib/utils/config.js';
-import configRoutes from './configRoutes.js';
-import submit from './submit.js';
+import configRoutes from './routes/configRoutes.js';
+import submit from './routes/submit.js';
 
 const router = express.Router();
 

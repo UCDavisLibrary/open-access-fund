@@ -11,7 +11,7 @@ class SubmissionService extends BaseService {
     this.store = SubmissionStore;
   }
 
-  async submit(data) {
+  async submit(data, recaptchaToken) {
     const ido = {action: 'submit'};
     const id = payload.getKey(ido);
 
@@ -20,7 +20,10 @@ class SubmissionService extends BaseService {
       fetchOptions: {
         method : 'POST',
         body: data,
-        credentials: 'omit'
+        credentials: 'omit',
+        headers: {
+          'X-Recaptcha-Token': recaptchaToken
+        }
       },
       json: true,
       onUpdate : resp => this.store.set(

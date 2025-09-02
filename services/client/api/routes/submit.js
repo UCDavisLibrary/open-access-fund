@@ -1,6 +1,7 @@
-import config from '../../lib/utils/config.js';
-import logger from '../../lib/utils/logger.js';
-import handleErrors from './handleErrors.js';
+import config from '../../../lib/utils/config.js';
+import logger from '../../../lib/utils/logger.js';
+import handleErrors from '../utils/handleErrors.js';
+import SubmissionPayload from '../utils/submissionPayload.js';
 
 import {RecaptchaEnterpriseServiceClient} from '@google-cloud/recaptcha-enterprise';
 const recaptchaClient = new RecaptchaEnterpriseServiceClient();
@@ -8,16 +9,18 @@ const recaptchaClient = new RecaptchaEnterpriseServiceClient();
 export default (app) => {
   app.post('/submit', async (req, res) => {
     try {
-      const payload = req.body;
+
+      // validate recaptcha
       if ( !config.recaptcha.disabled.value ){
-        if ( !payload.recaptchaToken ) {
+        const recaptchaToken = req.get('X-Recaptcha-Token');
+        if ( !recaptchaToken ) {
           return res.status(401).json({error: 'recaptchaToken is required'});
         }
         const projectPath = recaptchaClient.projectPath(config.recaptcha.projectId.value);
         const request = ({
           assessment: {
             event: {
-              token: payload.recaptchaToken,
+              token: recaptchaToken,
               siteKey: config.recaptcha.key.value,
             },
           },
@@ -39,8 +42,16 @@ export default (app) => {
         }
 
         logger.info({req, message: 'Recaptcha passed', details: response.riskAnalysis});
-
       }
+
+      // validate payload
+      const payload = new SubmissionPayload(req.body);
+      await payload.validate();
+      if ( payload.isInvalid ) {
+        return payload.invalidResponse(res, req);
+      }
+
+
     } catch(e){
       return handleErrors(res, req, e);
     }

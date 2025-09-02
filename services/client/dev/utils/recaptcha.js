@@ -23,6 +23,10 @@ class Recaptcha {
       return;
     }
     this.config = config.payload;
+    if ( this.config.disabled ){
+      this.logger.info('Recaptcha is disabled');
+      return true;
+    }
     try {
       await this.loadScript();
     } catch (e) {
@@ -51,7 +55,7 @@ class Recaptcha {
   async execute(action){
     action = action || this.config.submissionAction || 'submit';
     let token;
-    if ( this.disabled || !this.config.key ) return token;
+    if ( this.config.disabled || !this.config.key ) return token;
     await this.scriptPromise;
     try {
       token = await window.grecaptcha.enterprise.execute(this.config.key, {action});

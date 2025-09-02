@@ -74,6 +74,16 @@ export function styles() {
       }
     }
 
+    .submitting-text {
+      display: none;
+    }
+    .submitting .submit-text {
+      display: none;
+    }
+    .submitting .submitting-text {
+      display: inline;
+    }
+
   `;
 
   return [
@@ -88,7 +98,7 @@ export function styles() {
 
 export function render() {
   return html`
-    <div class='container'>
+    <div class='container ${this._submitting ? 'submitting' : ''}'>
       <form @submit=${this._onSubmit} novalidate>
         <div>Fields marked with * are required</div>
         ${_renderAuthorInfo.call(this)}
@@ -103,7 +113,10 @@ export function render() {
             .value=${this.payload.authorComment || ''}
             @input=${e => this._onInput('authorComment', e.target.value)}></textarea>
         </div>
-        <button type='submit' class='btn btn--primary'>Submit</button>
+        <button type='submit' class='btn btn--primary' ?disabled=${this._submitting}>
+          <span class='submit-text'>Submit</span>
+          <span class='submitting-text'>Submitting...</span>
+        </button>
       </form>
     </div>
   `;

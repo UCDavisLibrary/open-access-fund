@@ -13,8 +13,8 @@ class SubmissionModel extends BaseModel {
     this.register('SubmissionModel');
   }
 
-  submit(data) {
-    return this.service.submit(data);
+  submit(data, recaptchaToken) {
+    return this.service.submit(data, recaptchaToken);
   }
 
 }

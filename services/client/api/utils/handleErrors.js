@@ -1,4 +1,4 @@
-import logger from '../../lib/utils/logger.js';
+import logger from '../../../lib/utils/logger.js';
 
 function handleError(res, req, error, details) {
   logger.error('Error in request', {error}, req.corkTraceId);
