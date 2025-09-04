@@ -317,8 +317,7 @@ function _renderFinanceAccountInfo(){
           id=${idGen.get('requestedAmount')}
           .value=${this.payload.requestedAmount || ''}
           required
-          max='1000'
-          type=number
+          inputmode='decimal'
           @input=${e => this._onInput('requestedAmount', e.target.value)}>
         <div>Max amount: $1000</div>
       </div>

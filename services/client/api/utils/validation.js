@@ -3,28 +3,40 @@ import handleError from './handleError.js';
 import { DataDefinitions } from "../../../lib/utils/DataDefinitions.js";
 import fundAccountUtils from "../../../lib/utils/fundAccountUtils.js";
 
+/**
+ * @description Returns "Required" validation message if value is null/undefined/empty
+ * @param {String} msg - The validation message to return. Default: 'Required'
+ * @returns
+ */
 const requiredString = (msg = 'Required') =>
   z.preprocess(
     v => (v == null ? '' : v),
     z.string().trim().min(1, msg)
   );
 
+/**
+ * @description Validates a value as a required number, allowing string inputs with commas and decimal points
+ * Delineates between "required" and "not a number" validation errors
+ * @param {Object} messages - Validation messages
+ * @param {String} messages.required - The "required" validation message. Default: "Required"
+ * @param {String} messages.nan - The "not a number" validation message. Default: "Must be a number"
+ * @returns
+ */
 export const requiredNumber = (
   messages = { required: "Required", nan: "Must be a number" }
   ) =>
   z.preprocess(
     v => {
-      if (v == null) return "";               // undefined/null -> ''
-      if (typeof v === "number") return String(v); // numbers -> strings
-      return String(v);                       // everything else -> string
+      if (v == null) return "";
+      return String(v);
     },
     z.string().trim().min(1, messages.required)
   )
   .pipe(
     z
       .string()
-      .regex(/^-?(?:\d+|\d*\.\d+)$/, messages.nan) // numeric check
-      .transform(Number)
+      .regex(/^-?(?:\d{1,3}(?:,\d{3})*|\d+)(?:\.\d+)?$/, messages.nan)
+      .transform(v => Number(v.replace(/,/g, '')))
   );
 
 const fundAccountSchema = z.
@@ -91,7 +103,14 @@ const submissionSchema = z
     financialContactEmail: requiredString().pipe(z.string().email().max(250)),
     financialContactPhone: requiredString().pipe(z.string().max(50)),
     fundAccount: fundAccountSchema,
-    requestedAmount: requiredNumber().refine(v => v > 0, {message: 'Must be greater than zero'}).refine(v => v <= 10000, {message: 'Must be less than or equal to $10,000'}),
+    requestedAmount: requiredNumber()
+      .pipe(z.number().gt(0, {message: 'Must be more than $0'}).lte(1000, {message: 'Must be less than or equal to $1,000'}))
+      .refine(v => (v*100) % 1 === 0, {message: 'Maximum two decimal places'}),
+    articleTitle: requiredString().pipe(z.string().max(1000)),
+    articleJournal: requiredString().pipe(z.string().max(1000)),
+    articleStatus: requiredString().pipe(z.enum(DataDefinitions.ARTICLE_STATUSES.map(s => s.value))),
+    articleLink: z.string().trim().url().max(2000).optional(),
+    authorComment: z.string().max(2000).optional()
   })
   .superRefine((data, ctx) => {
 
