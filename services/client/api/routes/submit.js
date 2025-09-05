@@ -3,7 +3,7 @@ import logger from '../../../lib/utils/logger.js';
 import handleError from '../utils/handleError.js';
 
 import validateRecaptcha from '../utils/recaptcha.js';
-import { validate, submissionSchema } from '../utils/validation.js';
+import { validate, submissionSchema } from '../utils/validate/index.js';
 
 
 export default (app) => {
