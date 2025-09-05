@@ -11,10 +11,14 @@ class SubmissionModel extends BaseModel {
     this.service = SubmissionService;
 
     this.register('SubmissionModel');
+
+    this.inject('ValidationModel');
   }
 
-  submit(data, recaptchaToken) {
-    return this.service.submit(data, recaptchaToken);
+  async submit(data, recaptchaToken) {
+    const r = await this.service.submit(data, recaptchaToken);
+    this.ValidationModel.notify('submission', r);
+    return r;
   }
 
 }

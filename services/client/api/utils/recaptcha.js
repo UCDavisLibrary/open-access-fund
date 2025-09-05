@@ -5,6 +5,10 @@ import handleError from '../utils/handleError.js';
 import {RecaptchaEnterpriseServiceClient} from '@google-cloud/recaptcha-enterprise';
 const recaptchaClient = new RecaptchaEnterpriseServiceClient();
 
+/**
+ * Middleware to validate reCAPTCHA tokens.
+ * @returns
+ */
 async function validateRecaptcha(req, res, next){
 
   try {

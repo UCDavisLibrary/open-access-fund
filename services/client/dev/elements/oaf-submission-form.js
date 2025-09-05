@@ -3,11 +3,12 @@ import {render, styles} from "./oaf-submission-form.tpl.js";
 
 import config from '../../../lib/utils/config.js';
 import recaptcha from '../utils/recaptcha.js';
-import { Registry, LitCorkUtils, Mixin, getLogger } from '@ucd-lib/cork-app-utils';
+import { Registry, LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 
+// cork models
 import '../../../lib/cork/models/ConfigModel.js';
 import '../../../lib/cork/models/SubmissionModel.js';
-
+import '../../../lib/cork/models/ValidationModel.js';
 Registry.ready();
 
 
@@ -66,6 +67,8 @@ export default class OafSubmissionForm extends Mixin(LitElement)
 
     console.log('submit', payload);
     const r = await this.SubmissionModel.submit(payload);
+    // todo - show error on recaptcha failure
+    // todo - show error on non validation failure
     console.log('response', r);
   }
 
