@@ -9,6 +9,7 @@ class Submission {
     try {
       await client.query('BEGIN');
 
+      // convert submission_status_id from name to id if needed
       if ( data.submission_status_id ){
         let r = await models.submissionStatus.getIdByName(data.submission_status_id);
         if ( r.error ) return r;

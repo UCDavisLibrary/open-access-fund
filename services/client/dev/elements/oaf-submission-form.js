@@ -69,6 +69,8 @@ export default class OafSubmissionForm extends Mixin(LitElement)
     const r = await this.SubmissionModel.submit(payload);
     // todo - show error on recaptcha failure
     // todo - show error on non validation failure
+    // todo - show success message
+    // todo - print that there was a validation error and scroll to top of form
     console.log('response', r);
   }
 

@@ -1,7 +1,7 @@
 import logger from '../../../lib/utils/logger.js';
 
 function handleError(res, req, error, details) {
-  logger.error('Error in request', {error}, req.corkTraceId);
+  logger.error('Error in request', {error, corkTraceId: req.corkTraceId});
 
   res.status(500).json({
     message : error.message,
