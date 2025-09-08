@@ -17,5 +17,19 @@ setUpApiRoutes(app);
 setUpStaticRoutes(app);
 
 app.listen(config.adminApp.ports.container.value, () => {
-  logger.info(`Admin application is running on container port ${config.adminApp.ports.container.value}`);
+  const configSummary = {
+    recaptcha: {
+      disabled: config.recaptcha.disabled.value
+    },
+    adminApp: {
+      env: config.adminApp.env,
+      host: config.adminApp.host.value,
+      ports: {
+        host: config.adminApp.ports.host.value,
+        container: config.adminApp.ports.container.value
+      },
+      bundleName: config.adminApp.bundleName.value
+    }
+  }
+  logger.info(`Admin application is running on container port ${config.adminApp.ports.container.value}`, {config: configSummary});
 });

@@ -7,11 +7,17 @@ import formStyles from "@ucd-lib/theme-sass/1_base_html/_forms.css.js";
 import listStyles from "@ucd-lib/theme-sass/2_base_class/_lists.css.js";
 import formClassStyles from "@ucd-lib/theme-sass/2_base_class/_forms.css.js";
 import buttonStyles from "@ucd-lib/theme-sass/2_base_class/_buttons.css.js";
+import alertStyles from "@ucd-lib/theme-sass/4_component/_messaging-alert.css.js";
 
+// brand components
+import '@ucd-lib/theme-elements/ucdlib/ucdlib-pages/ucdlib-pages.js';
+
+// local utils
 import { DataDefinitions } from '../../../lib/utils/DataDefinitions.js';
 import fundAccountUtils from '../../../lib/utils/fundAccountUtils.js';
 import IdGenerator from '../utils/IdGenerator.js';
 
+// local components
 import '../components/cork-character-tracker.js';
 import '../components/cork-field-container.js';
 import { styles as corkFieldContainerStyles } from '../components/cork-field-container.tpl.js';
@@ -94,15 +100,27 @@ export function styles() {
     listStyles,
     buttonStyles,
     formClassStyles,
+    alertStyles,
     ...corkFieldContainerStyles(),
     elementStyles
   ];
 }
 
+/**
+ * @description Main render function for the OAF submission form
+ * @returns {TemplateResult}
+ */
 export function render() {
   return html`
-    <div class='container ${this._submitting ? 'submitting' : ''}'>
-      <form @submit=${this._onSubmit} novalidate>
+  <div class='container ${this._submitting ? 'submitting' : ''}'></div>
+    <ucdlib-pages attr-for-selected='page-id' selected=${this.page}>
+      ${_renderRecaptchaFailure.call(this)}
+      ${_render500Error.call(this)}
+      ${_renderSubmissionSuccess.call(this)}
+      <form page-id='oaf-submission-form' @submit=${this._onSubmit} novalidate>
+        <div ?hidden=${!this._validationError} class='alert alert--error'>
+          <div>There were errors with your submission. Please fix the specified form fields and resubmit.</div>
+        </div>
         <div>Fields marked with * are required</div>
         ${_renderAuthorInfo.call(this)}
         ${_renderFinancialContactInfo.call(this)}
@@ -121,10 +139,57 @@ export function render() {
           <span class='submitting-text'>Submitting...</span>
         </button>
       </form>
+    </ucdlib-pages>
+  </div>
+  `;
+}
+
+/**
+ * @description Renders the recaptcha failure message
+ * @returns {TemplateResult}
+ */
+function _renderRecaptchaFailure(){
+  return html`
+    <div page-id='recaptcha-failure'>
+      <div class='alert alert--error'>
+        <p>Submission unsuccessful. There was an error verifying the reCAPTCHA. Please try submitting from another browser.</p>
+      </div>
     </div>
   `;
 }
 
+/**
+ * @description Renders the 500 error message
+ * @returns {TemplateResult}
+ */
+function _render500Error(){
+  return html`
+    <div page-id='error-500'>
+      <div class='alert alert--error'>
+        <p>Submission unsuccessful. An unexpected error occurred. Please try again later.</p>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * @description Renders the submission success message
+ * @returns {TemplateResult}
+ */
+function _renderSubmissionSuccess(){
+  return html`
+    <div page-id='submission-success'>
+      <div class='alert alert--success'>
+        <slot>Your submission was successful. You will receive a confirmation email shortly.</slot>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * @description Renders the author information fieldset section of the form
+ * @returns {TemplateResult}
+ */
 function _renderAuthorInfo(){
   return html`
     <fieldset>
@@ -227,6 +292,10 @@ function _renderAuthorInfo(){
   `;
 }
 
+/**
+ * Renders the financial contact information fieldset section of the form
+ * @returns {TemplateResult}
+ */
 function _renderFinancialContactInfo(){
   return html`
     <fieldset>
@@ -275,6 +344,10 @@ function _renderFinancialContactInfo(){
   `;
 }
 
+/**
+ * Renders the financial account information fieldset section of the form
+ * @returns {TemplateResult}
+ */
 function _renderFinanceAccountInfo(){
   return html`
     <fieldset>
@@ -334,6 +407,10 @@ function _renderFinanceAccountInfo(){
   `;
 }
 
+/**
+ * Renders the article information fieldset section of the form
+ * @returns {TemplateResult}
+ */
 function _renderArticleInfo(){
   return html`
     <fieldset>
