@@ -4,13 +4,42 @@ class Config {
     this.adminApp = {
       env: this._getEnv('ADMIN_APP_ENV').value === 'dev' ? 'dev' : 'prod',
       title: this._getEnv('ADMIN_APP_TITLE', 'UC Davis Open Access Fund Administration'),
-      routes: this._getEnv('ADMIN_APP_ROUTES', [], false, true),
+      routes: this._getEnv('ADMIN_APP_ROUTES', ['logout'], false, true),
       ports: {
         host: this._getEnv('ADMIN_APP_HOST_PORT', 3000),
         container: this._getEnv('ADMIN_APP_CONTAINER_PORT', 3000)
       },
       bundleName: this._getEnv('ADMIN_APP_BUNDLE_NAME', 'open-access-fund.js'),
-      host: this._getEnv('ADMIN_APP_HOST'),
+      host: this._getEnv('ADMIN_APP_HOST', '' ),
+
+      auth: {
+        keycloakJsClient: {
+          url: this._getEnv('ADMIN_APP_KEYCLOAK_URL', 'https://auth.library.ucdavis.edu'),
+          realm: this._getEnv('ADMIN_APP_KEYCLOAK_REALM', 'internal'),
+          clientId: this._getEnv('ADMIN_APP_KEYCLOAK_CLIENT_ID', 'oaf-admin-client'),
+        },
+        oidcScope: this._getEnv('ADMIN_APP_OIDC_SCOPE', 'profile roles ucd-ids'),
+        serverCacheExpiration: this._getEnv('ADMIN_APP_SERVER_CACHE_EXPIRATION', '10 minutes'),
+        serverCacheLruSize: this._getEnv('ADMIN_APP_SERVER_CACHE_LRU_SIZE', 3),
+        silentCheckSsoRedirectUri: this._getEnv('ADMIN_APP_SILENT_CHECK_SSO_REDIRECT_URI', 'silent-check-sso.html'),
+        tokenRefreshRate: this._getEnv('ADMIN_APP_TOKEN_REFRESH_RATE', 300), // seconds
+        loginCheckRefreshRate: this._getEnv('ADMIN_APP_LOGIN_CHECK_REFRESH_RATE', 10 * 60 * 1000) // milliseconds
+      },
+
+      clientLogger: {
+        logLevel: this._getEnv('ADMIN_APP_CLIENT_LOGGER_LOG_LEVEL', 'info'),
+        logLevels: {},
+        disableCallerInfo: this._getEnv('ADMIN_APP_CLIENT_LOGGER_DISABLE_CALLER_INFO', false),
+        reportErrors: {
+          enabled: this._getEnv('ADMIN_APP_CLIENT_REPORT_ERRORS_ENABLED', false),
+          url: this._getEnv('ADMIN_APP_CLIENT_REPORT_ERRORS_URL', ''),
+          method: this._getEnv('ADMIN_APP_CLIENT_REPORT_ERRORS_METHOD', 'POST'),
+          key: this._getEnv('ADMIN_APP_CLIENT_REPORT_ERRORS_KEY', ''),
+          headers: {},
+          sourceMapExtension: this._getEnv('ADMIN_APP_CLIENT_REPORT_ERRORS_SOURCE_MAP_EXTENSION', '.map'),
+          customAttributes: {appOwner: 'itis', appName: 'oaf-admin-client'}
+        }
+      }
     }
 
 
@@ -24,7 +53,7 @@ class Config {
     }
 
     this.api = {
-      root: this._getEnv('API_ROOT', '/api'),
+      root: this._getEnv('API_ROOT', 'api'),
     }
 
     this.recaptcha = {
@@ -48,7 +77,7 @@ class Config {
     if (typeof window !== 'undefined' && window.APP_CONFIG) {
       return window.APP_CONFIG;
     }
-    return {};
+    return this.makeAppConfig();
   }
 
   /**
@@ -75,6 +104,35 @@ class Config {
 
     config.title = this.adminApp.title.value;
     config.routes = this.adminApp.routes.value;
+    config.host = this.adminApp.host.value;
+    config.apiRoot = this.api.root.value;
+
+    config.auth = {
+      clientInit: {
+        url: this.adminApp.auth.keycloakJsClient.url.value,
+        realm: this.adminApp.auth.keycloakJsClient.realm.value,
+        clientId: this.adminApp.auth.keycloakJsClient.clientId.value,
+      },
+      oidcScope: this.adminApp.auth.oidcScope.value,
+      silentCheckSsoRedirectUri: this.adminApp.auth.silentCheckSsoRedirectUri.value,
+      tokenRefreshRate: this.adminApp.auth.tokenRefreshRate.value,
+      loginCheckRefreshRate: this.adminApp.auth.loginCheckRefreshRate.value
+    };
+
+    config.logger = {
+      logLevel: this.adminApp.clientLogger.logLevel.value,
+      logLevels: this.adminApp.clientLogger.logLevels.value,
+      disableCallerInfo: this.adminApp.clientLogger.disableCallerInfo.value,
+      reportErrors: {
+        enabled: this.adminApp.clientLogger.reportErrors.enabled.value,
+        url: this.adminApp.clientLogger.reportErrors.url.value,
+        method: this.adminApp.clientLogger.reportErrors.method.value,
+        key: this.adminApp.clientLogger.reportErrors.key.value,
+        headers: this.adminApp.clientLogger.reportErrors.headers.value,
+        sourceMapExtension: this.adminApp.clientLogger.reportErrors.sourceMapExtension.value,
+        customAttributes: this.adminApp.clientLogger.reportErrors.customAttributes
+      }
+    };
 
     return config;
   }

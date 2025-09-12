@@ -10,8 +10,8 @@ export function styles() {
   return [elementStyles];
 }
 
-export function render() { 
+export function render() {
 return html`
 
-
+<p>hello world</p>
 `;}

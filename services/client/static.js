@@ -25,7 +25,7 @@ export default (app) => {
     enable404 : false,
 
     getConfig : async (req, res, next) => {
-      next(config.makeAppConfig());
+      next(config.appConfig);
     },
 
     template : (req, res, next) => {

@@ -16,7 +16,7 @@ class SubmissionService extends BaseService {
     const id = payload.getKey(ido);
 
     await this.request({
-      url : `${config.adminApp.host.value}/submit`,
+      url : `${config.appConfig.host}/${config.appConfig.apiRoot}/submit`,
       fetchOptions: {
         method : 'POST',
         body: data,

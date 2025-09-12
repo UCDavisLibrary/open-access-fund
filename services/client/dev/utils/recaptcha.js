@@ -18,7 +18,7 @@ class Recaptcha {
     if ( this.loaded ) return;
     const configModel = Registry.getModel('ConfigModel');
     const config = await configModel.getByCategory('recaptcha');
-    if ( !config.state === 'loaded' ) {
+    if ( config.state !== 'loaded' ) {
       this.logger.error('Error loading recaptcha config');
       return;
     }

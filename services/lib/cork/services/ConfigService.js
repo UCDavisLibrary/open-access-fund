@@ -12,7 +12,7 @@ class ConfigService extends BaseService {
   }
 
   get baseUrl(){
-    return `${config.adminApp.host.value}/config`;
+    return `${config.appConfig.host}/${config.appConfig.apiRoot}/config`;
   }
 
   async getByCategory(category){
