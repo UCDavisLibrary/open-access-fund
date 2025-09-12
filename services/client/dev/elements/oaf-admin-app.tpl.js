@@ -2,7 +2,7 @@ import { html, css } from 'lit';
 
 export function styles() {
   const elementStyles = css`
-    :host {
+    oaf-admin-app {
       display: block;
     }
   `;
@@ -11,7 +11,22 @@ export function styles() {
 }
 
 export function render() {
-return html`
+  return html`
+    ${renderHeader.call(this)}
+    <p>hello world</p>
+  `;
+}
 
-<p>hello world</p>
-`;}
+
+function renderHeader(){
+  return html`
+    <ucd-theme-header>
+      <ucdlib-branding-bar
+        site-name="UC Davis Library"
+        slogan="Open Access Fund Administration">
+      </ucdlib-branding-bar>
+      <ucd-theme-primary-nav>
+      </ucd-theme-primary-nav>
+    </ucd-theme-header>
+  `;
+}

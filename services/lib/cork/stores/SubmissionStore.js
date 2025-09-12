@@ -1,4 +1,5 @@
-import {BaseStore, LruStore} from '@ucd-lib/cork-app-utils';
+import {LruStore} from '@ucd-lib/cork-app-utils';
+import BaseStore from './BaseStore.js';
 
 class SubmissionStore extends BaseStore {
 
