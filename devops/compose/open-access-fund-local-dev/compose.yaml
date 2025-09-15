@@ -7,6 +7,7 @@ services:
       - .env
     environment:
       ADMIN_APP_ENV: 'dev'
+      SUBMISSION_FORM_URL: 'http://localhost:3001'
       GOOGLE_APPLICATION_CREDENTIALS: /etc/gc-service-account.json
       PGUSER: 'postgres'
       PGHOST: 'db'

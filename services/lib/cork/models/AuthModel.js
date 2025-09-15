@@ -16,7 +16,6 @@ class AuthModel extends BaseModel {
 
     this.register('AuthModel');
 
-    // todo, inject app state model
   }
 
   /**
@@ -45,17 +44,6 @@ class AuthModel extends BaseModel {
    */
   get token(){
     return this.store.token;
-  }
-
-  /**
-   * @description Returns true if logged in user would like to log out
-   * @param {Object} location - location object from AppStateStore
-   * @returns {Boolean}
-   */
-  _onAppStateUpdate(e){
-    if ( e?.location?.path?.[0] === 'logout' ) {
-      this.logout();
-    }
   }
 
   /**

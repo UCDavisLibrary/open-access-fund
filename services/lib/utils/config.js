@@ -42,6 +42,12 @@ class Config {
       }
     }
 
+    this.icons = {
+      client: {
+        noInstantiation: true
+      }
+    }
+
 
     this.db = {
       tables: {
@@ -66,6 +72,10 @@ class Config {
 
     this.logger = {
       name: this._getEnv('LOGGER_NAME', 'open-access-fund')
+    }
+
+    this.submissionForm = {
+      url: this._getEnv('SUBMISSION_FORM_URL'),
     }
   }
 
@@ -132,6 +142,14 @@ class Config {
         sourceMapExtension: this.adminApp.clientLogger.reportErrors.sourceMapExtension.value,
         customAttributes: this.adminApp.clientLogger.reportErrors.customAttributes
       }
+    };
+
+    config.corkIconConfig = {
+      noInstantiation: this.icons.client.noInstantiation
+    }
+
+    config.submissionForm = {
+      url: this.submissionForm.url.value
     };
 
     return config;

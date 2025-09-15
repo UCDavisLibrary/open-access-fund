@@ -10,6 +10,10 @@ import '@ucd-lib/theme-elements/brand/ucd-theme-header/ucd-theme-header.js';
 import '@ucd-lib/theme-elements/ucdlib/ucdlib-branding-bar/ucdlib-branding-bar.js';
 import '@ucd-lib/theme-elements/ucdlib/ucdlib-pages/ucdlib-pages.js';
 
+// app elements
+import '../components/cork-app-error.js';
+import '../components/cork-app-loader.js';
+
 import { Registry, LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-element.js";
 import config from '../../../lib/utils/config.js';
@@ -17,6 +21,7 @@ import config from '../../../lib/utils/config.js';
 // cork models
 import AppStateModel from '../../../lib/cork/models/AppStateModel.js';
 import AuthModel from '../../../lib/cork/models/AuthModel.js';
+import '../../../lib/cork/models/IconModel.js';
 import '../../../lib/cork/models/SubmissionModel.js';
 import '../../../lib/cork/models/ValidationModel.js';
 
@@ -44,7 +49,7 @@ export default class OafAdminApp extends Mixin(LitElement)
     this.page = '';
     this._firstAppStateUpdate = false;
 
-    this._injectModel('AppStateModel');
+    this._injectModel('AppStateModel', 'AuthModel');
   }
 
   /**
@@ -65,6 +70,11 @@ export default class OafAdminApp extends Mixin(LitElement)
     this.closeNav();
     const { page, location } = e;
     this.page = page;
+
+    if ( this.page === 'logout' ) {
+      AuthModel.logout();
+      return;
+    }
   }
 
 

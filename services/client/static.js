@@ -3,6 +3,7 @@ import spaMiddleware from '@ucd-lib/spa-router-middleware';
 import { fileURLToPath } from 'url';
 import loaderHtml from './html/loader.html.js';
 import config from '../lib/utils/config.js';
+import { iconsets } from '@ucd-lib/cork-icon';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -32,7 +33,8 @@ export default (app) => {
       next({
         title: config.adminApp.title.value,
         bundle,
-        loaderHtml
+        loaderHtml,
+        preloadedIcons: iconsets.preloadIconScript()
       });
     }
   });
