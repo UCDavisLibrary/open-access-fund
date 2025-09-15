@@ -1,17 +1,26 @@
 import handleError from '../handleError.js';
 import submissionSchema from './schemas/submission.js';
+import submissionStatusQuerySchema from './schemas/submissionStatusQuery.js';
 
 /**
  * @description Middleware to validate request data against a Zod schema.
  * Combines req.params, req.query, and req.body for validation.
  * On success, attaches validated data to req.validated.
  * @param {*} schema - A Zod schema
+ * @param {*} opts - Options for validation
  * @returns
  */
-function validate(schema) {
+function validate(schema, opts={}) {
   return async (req, res, next) => {
     try {
-      const input = { ...req.params, ...req.query, ...req.body };
+      let input = {};
+      if ( Array.isArray(opts.reqParts ) ) {
+        for ( const part of opts.reqParts ) {
+          input = { ...input, ...(req[part]||{}) };
+        }
+      } else {
+        input = { ...req.params, ...req.query, ...req.body };
+      }
       const parse = await schema.safeParseAsync(input);
       if (parse.success) {
         req.validated = parse.data;
@@ -37,5 +46,6 @@ function formatErrorResponse(zodError) {
 
 export {
   validate,
-  submissionSchema
+  submissionSchema,
+  submissionStatusQuerySchema
 };

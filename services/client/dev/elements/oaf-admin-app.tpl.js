@@ -35,7 +35,9 @@ function renderSubmissionsQueryPage(){
       <div><h1 class="page-title">Submissions</h1></div>
       <ol class="breadcrumbs"><li>Submissions</li></ol>
       <div class="l-container l-basic--flipped">
-        <div class="l-content">hello world</div>
+        <div class="l-content">
+          <oaf-submission-query></oaf-submission-query>
+        </div>
         <div class="l-sidebar-second"></div>
       </div>
     </div>

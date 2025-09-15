@@ -27,7 +27,7 @@ export default class BaseServiceImp extends BaseService {
    */
   async request(options){
     const appConfig = config.appConfig;
-    if( appConfig.auth?.keycloakClient ) {
+    if( appConfig?.auth?.keycloakClient ) {
       const kc = appConfig.auth.keycloakClient;
       if( !options.fetchOptions ) options.fetchOptions = {};
       if( !options.fetchOptions.headers ) options.fetchOptions.headers = {};
@@ -35,7 +35,7 @@ export default class BaseServiceImp extends BaseService {
         await kc.updateToken(10);
         options.fetchOptions.headers.Authorization = `Bearer ${kc.token}`
       } catch (error) {}
-    } else {
+    } else if( !options?.fetchOptions?.headers?.['X-Recaptcha-Token']) {
       this.logger.warn('No auth client found in appConfig, requests will be made without auth headers');
     }
     return await super.request(options);
@@ -49,16 +49,19 @@ export default class BaseServiceImp extends BaseService {
    */
   async _handleError(options, resolve, error) {
     await super._handleError(options, resolve, error);
-    if ( error?.response?.status >= 500) {
-      const e = {
-        type: 'cork-service.server-error',
-        payload: error?.payload,
-        url: options.url,
+    try {
+      if ( error?.response?.status >= 500) {
+        const e = {
+          type: 'cork-service.server-error',
+          payload: error?.payload,
+          url: options.url,
+        }
+        if ( options.json && options?.fetchOptions?.body ){
+          e.requestBody = JSON.parse(options.fetchOptions.body);
+        }
+        this.logger.error(e);
       }
-      if ( options.json && options?.fetchOptions?.body ){
-        e.requestBody = JSON.parse(options.fetchOptions.body);
-      }
-      this.logger.error(e);
-    }
+    } catch{}
+
   }
 }

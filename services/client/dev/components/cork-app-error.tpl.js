@@ -1,4 +1,5 @@
 import { html, css } from 'lit';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
 import buttonStyles from '@ucd-lib/theme-sass/2_base_class/_buttons.css.js';
 
@@ -137,7 +138,7 @@ return html`
             </div>
             <div ?hidden=${!error.details} class='error-detail'>
               <div>Details</div>
-              <pre>${JSON.stringify(error.details, null, 2)}</pre>
+              <pre>${unsafeHTML(JSON.stringify(error.details, null, 2))}</pre>
             </div>
           </div>
         </div>

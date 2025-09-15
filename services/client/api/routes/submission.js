@@ -3,7 +3,8 @@ import handleError from '../utils/handleError.js';
 import textUtils from '../../../lib/utils/textUtils.js';
 import models from '../../../lib/models/index.js';
 import validateRecaptcha from '../utils/recaptcha.js';
-import { validate, submissionSchema } from '../utils/validate/index.js';
+import { validate, submissionSchema, submissionStatusQuerySchema } from '../utils/validate/index.js';
+import protect from '../utils/protect.js';
 
 
 export default (app) => {
@@ -28,5 +29,32 @@ export default (app) => {
     } catch(e){
       return handleError(res, req, e);
     }
+  });
+
+  /**
+   * @description List submission statuses
+   */
+  app.get('/submission-status', protect(), validate(submissionStatusQuerySchema), async (req, res) => {
+    try {
+      const result = await models.submissionStatus.list(req.validated);
+      if ( result.error ) {
+        throw result.error;
+      }
+
+      // convert keys to camelCase
+      const statuses = result.res.rows.map(r => {
+        let out = {};
+        for ( const key in r ) {
+          out[textUtils.toCamelCase(key)] = r[key];
+        }
+        return out;
+      });
+
+      return res.status(200).json(statuses);
+
+    } catch(e){
+      return handleError(res, req, e);
+    }
+
   });
 };

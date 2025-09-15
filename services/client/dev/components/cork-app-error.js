@@ -69,8 +69,16 @@ export default class CorkAppError extends Mixin(LitElement)
     const url = serviceError?.response?.url;
     const statusCode = serviceError?.response?.status || '';
 
-    const heading = error?.errorMessage || error?.errorSettings?.message || serviceError?.message || 'Unknown error';
-    const details = serviceError?.payload
+    const details = serviceError?.payload;
+    const heading = error?.errorMessage ||
+      error?.errorSettings?.message ||
+      details?.message ||
+      serviceError?.message ||
+      'Unknown error';
+
+    if ( details?.stack ){
+      details.stack = details.stack.replaceAll('\n', '<br/>')
+    }
 
     const out = {
       heading,
