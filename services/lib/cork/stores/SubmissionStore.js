@@ -8,13 +8,17 @@ class SubmissionStore extends BaseStore {
 
     this.data = {
       submit: new LruStore({name: 'submission.submit'}),
-      statusList: new LruStore({name: 'submission.statusList'})
+      statusList: new LruStore({name: 'submission.statusList'}),
+      query: new LruStore({name: 'submission.query'})
     };
     this.events = {};
 
     this.errorSettings = {
       'submission.statusList': {
         message: 'Unable to retrieve list of submission statuses'
+      },
+      'submission.query': {
+        message: 'Unable to query submissions'
       }
     }
   }

@@ -59,6 +59,26 @@ class SubmissionService extends BaseService {
     return store.get(id);
   }
 
+  async query(query={}) {
+    const ido = {action: 'query', ...query};
+    const id = payload.getKey(ido);
+    const store = this.store.data.query;
+
+    await this.checkRequesting(
+      id, store,
+      () => this.request({
+        url : `${this.baseUrl}/submission/query`,
+        qs: query,
+        checkCached : () => store.get(id),
+        onUpdate : resp => this.store.set(
+          payload.generate(ido, resp),
+          store
+        )
+      })
+    );
+    return store.get(id);
+  }
+
 }
 
 const service = new SubmissionService();

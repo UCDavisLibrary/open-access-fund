@@ -56,7 +56,7 @@ function renderHeader(){
       <ucd-theme-primary-nav>
         <a href='/'>Submissions</a>
         ${when(config.appConfig?.submissionForm?.url, () => html`
-          <a href='${config.appConfig.submissionForm.url.value}'>Submission Form</a>
+          <a href='${config.appConfig.submissionForm.url}'>Submission Form</a>
         `)}
       </ucd-theme-primary-nav>
     </ucd-theme-header>

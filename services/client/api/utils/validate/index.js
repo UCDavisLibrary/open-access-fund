@@ -1,6 +1,7 @@
 import handleError from '../handleError.js';
 import submissionSchema from './schemas/submission.js';
 import submissionStatusQuerySchema from './schemas/submissionStatusQuery.js';
+import submissionQuerySchema from './schemas/submissionQuery.js';
 
 /**
  * @description Middleware to validate request data against a Zod schema.
@@ -44,8 +45,13 @@ function formatErrorResponse(zodError) {
   return { validationError: true, errors: issues };
 }
 
+const schema = {
+  submission: submissionSchema,
+  submissionStatusQuery: submissionStatusQuerySchema,
+  submissionQuery: submissionQuerySchema
+}
+
 export {
   validate,
-  submissionSchema,
-  submissionStatusQuerySchema
+  schema
 };

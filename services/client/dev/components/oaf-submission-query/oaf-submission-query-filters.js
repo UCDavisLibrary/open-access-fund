@@ -5,6 +5,7 @@ import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-el
 import payloadUtils from '../../../../lib/cork/payload.js';
 
 import AppComponentController from '../../controllers/AppComponentController.js';
+import QueryStringController from '../../controllers/QueryStringController.js';
 
 export default class OafSubmissionQueryFilters extends Mixin(LitElement)
   .with(LitCorkUtils, MainDomElement) {
@@ -23,6 +24,7 @@ export default class OafSubmissionQueryFilters extends Mixin(LitElement)
   constructor() {
     super();
     this.appComponentController = new AppComponentController(this);
+    this.qsCtl = new QueryStringController(this, {types: {status: 'array'}});
 
     this.statusListQuery = {excludeArchived: true};
     this.statusOptions = [];
@@ -42,7 +44,21 @@ export default class OafSubmissionQueryFilters extends Mixin(LitElement)
     const id = payloadUtils.getKey({action: 'statusList', ...this.statusListQuery});
     if ( id !== e.id ) return;
     this.statusOptions = JSON.parse(JSON.stringify(e.payload));
-    console.log(this.statusOptions);
+  }
+
+  _onFilterUpdate(filter, value){
+    this.qsCtl.deleteParam('page');
+    this.qsCtl.setParam(filter, value);
+    if ( this.timeout ) clearTimeout(this.timeout);
+    this.timeout = setTimeout(() => {
+      this.qsCtl.setLocation();
+    }, 400);
+  }
+
+  _onSubmit(e) {
+    e.preventDefault();
+    if ( this.timeout ) clearTimeout(this.timeout);
+    this.qsCtl.setLocation();
   }
 
 }

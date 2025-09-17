@@ -1,7 +1,8 @@
 import {PayloadUtils} from '@ucd-lib/cork-app-utils'
 
 const ID_ORDER = [
-  'category', 'action', 'excludeArchived'
+  'category', 'action', 'excludeArchived', 'page',
+  'status', 'submittedAfter', 'submittedBefore', 'keyword'
 ];
 
 let inst = new PayloadUtils({

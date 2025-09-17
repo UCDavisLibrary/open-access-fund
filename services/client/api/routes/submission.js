@@ -3,7 +3,7 @@ import handleError from '../utils/handleError.js';
 import textUtils from '../../../lib/utils/textUtils.js';
 import models from '../../../lib/models/index.js';
 import validateRecaptcha from '../utils/recaptcha.js';
-import { validate, submissionSchema, submissionStatusQuerySchema } from '../utils/validate/index.js';
+import { validate, schema } from '../utils/validate/index.js';
 import protect from '../utils/protect.js';
 
 
@@ -12,7 +12,7 @@ export default (app) => {
   /**
    * @description Creates a new OAF application submission
    */
-  app.post('/submit', validateRecaptcha, validate(submissionSchema), async (req, res) => {
+  app.post('/submit', validateRecaptcha, validate(schema.submission), async (req, res) => {
     try {
       const data = {};
       for ( const key in req.validated ) {
@@ -34,7 +34,7 @@ export default (app) => {
   /**
    * @description List submission statuses
    */
-  app.get('/submission-status', protect(), validate(submissionStatusQuerySchema), async (req, res) => {
+  app.get('/submission-status', protect(), validate(schema.submissionStatusQuery), async (req, res) => {
     try {
       const result = await models.submissionStatus.list(req.validated);
       if ( result.error ) {
@@ -55,6 +55,18 @@ export default (app) => {
     } catch(e){
       return handleError(res, req, e);
     }
+  });
 
+  app.get('/submission/query', protect(), validate(schema.submissionQuery), async (req, res) => {
+    try {
+      const result = await models.submission.query(req.validated);
+      if ( result.error ) {
+        throw result.error;
+      }
+
+      return res.status(200).json(result.res);
+    } catch(e){
+      return handleError(res, req, e);
+    }
   });
 };

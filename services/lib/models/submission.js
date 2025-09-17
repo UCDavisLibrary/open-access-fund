@@ -60,6 +60,82 @@ class Submission {
       client.release();
     }
   }
+
+  async query(params={}){
+    const client = await pgClient.pool.connect();
+    try {
+      await client.query('BEGIN');
+      const perPage = parseInt(config.adminApp.submissionPaginationSize.value);
+      const page = params.page || 1;
+      const offset = (page - 1) * perPage;
+
+
+      const where = [];
+      const values = [];
+      let i = 1;
+
+      // Status
+      if (Array.isArray(params.status) && params.status.length) {
+        where.push(`
+          s.submission_status_id IN (
+            SELECT get_submission_status_id(x)
+            FROM unnest($${i++}::text[]) AS t(x)
+          )
+        `);
+        values.push(params.status);
+      }
+
+      // Submission date
+      if (params.submittedAfter) {
+        where.push(`s.created_at >= $${i++}`);
+        values.push(params.submittedAfter);
+      }
+      if (params.submittedBefore) {
+        where.push(`s.created_at <= $${i++}`);
+        values.push(params.submittedBefore);
+      }
+
+      // Keyword search
+      if (params.keyword) {
+        where.push(`s.tsv_content @@ websearch_to_tsquery('english', $${i++})`);
+        values.push(params.keyword);
+      }
+
+      const whereSQL = where.length ? `WHERE ${where.join(' AND ')}` : '';
+
+      // get total count
+      const countSQL = `
+        SELECT COUNT(*)::int AS count
+        FROM submission_simple_json_v v
+        JOIN submission s ON s.submission_id = v.submission_id
+        ${whereSQL};
+      `;
+      console.log(params, countSQL, values);
+      const { rows: countRows } = await client.query(countSQL, values);
+      const total = countRows[0]?.count ?? 0;
+
+      // get paginated results
+      const resultsSQL = `
+        SELECT v.*
+        FROM submission_simple_json_v v
+        JOIN submission s ON s.submission_id = v.submission_id
+        ${whereSQL}
+        ORDER BY s.created_at DESC, s.submission_id DESC
+        LIMIT $${i++} OFFSET $${i++};
+      `;
+      console.log(params, resultsSQL, [...values, perPage, offset]);
+      const { rows: results } = await client.query(resultsSQL, [...values, perPage, offset]);
+
+      await client.query('COMMIT');
+      return { res: { total, page, perPage, results } };
+
+    } catch (error) {
+      await client.query('ROLLBACK');
+      return { error };
+    } finally {
+      client.release();
+    }
+  }
 }
 
 

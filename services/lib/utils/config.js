@@ -11,6 +11,7 @@ class Config {
       },
       bundleName: this._getEnv('ADMIN_APP_BUNDLE_NAME', 'open-access-fund.js'),
       host: this._getEnv('ADMIN_APP_HOST', '' ),
+      submissionPaginationSize: this._getEnv('ADMIN_APP_SUBMISSION_PAGINATION_SIZE', 20),
 
       auth: {
         keycloakJsClient: {

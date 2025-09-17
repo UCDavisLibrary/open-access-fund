@@ -25,6 +25,10 @@ class SubmissionModel extends BaseModel {
     return this.service.statusList(query);
   }
 
+  async query(query={}) {
+    return this.service.query(query);
+  }
+
 }
 
 const model = new SubmissionModel();

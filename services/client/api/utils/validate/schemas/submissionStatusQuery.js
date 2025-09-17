@@ -2,14 +2,12 @@ import * as z from "zod";
 
 const submissionStatusQuerySchema = z.object({
   excludeArchived: z.preprocess((val) => {
-    if ( val === 'true' ) return true;
     if ( val === 'false' ) return false;
-    return val;
+    if ( val === 'true' ) return true;
   }, z.boolean().optional()),
   archivedOnly: z.preprocess((val) => {
-    if ( val === 'true' ) return true;
     if ( val === 'false' ) return false;
-    return val;
+    if ( val === 'true' ) return true;
   }, z.boolean().optional())
 });
 
