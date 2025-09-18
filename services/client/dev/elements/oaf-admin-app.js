@@ -10,6 +10,7 @@ import '@ucd-lib/theme-elements/brand/ucd-theme-header/ucd-theme-header.js';
 import '@ucd-lib/theme-elements/ucdlib/ucdlib-branding-bar/ucdlib-branding-bar.js';
 import '@ucd-lib/theme-elements/ucdlib/ucdlib-pages/ucdlib-pages.js';
 import '@ucd-lib/theme-elements/brand/ucd-theme-slim-select/ucd-theme-slim-select.js';
+import '@ucd-lib/theme-elements/brand/ucd-theme-pagination/ucd-theme-pagination.js';
 
 // app elements
 import '../components/cork-app-error.js';

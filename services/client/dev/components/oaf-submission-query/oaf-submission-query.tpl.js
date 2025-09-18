@@ -14,4 +14,11 @@ export function styles() {
 export function render() {
 return html`
   <oaf-submission-query-filters></oaf-submission-query-filters>
+  <ucd-theme-pagination
+    current-page=${this.page}
+    max-pages=${this.totalPages}
+    ellipses
+    xs-screen
+    @page-change=${this._onPageChange}
+  ></ucd-theme-pagination>
 `;}
