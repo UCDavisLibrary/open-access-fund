@@ -27,11 +27,15 @@ export default class OafSubmissionQuery extends Mixin(LitElement)
 
     this.appComponentController = new AppComponentController(this);
     this.qsCtl = new QueryStringController(this, {types: {status: 'array'}});
+    this.resetState();
+
+    this._injectModel('AppStateModel', 'SubmissionModel');
+  }
+
+  resetState() {
     this.results = [];
     this.page = 1;
     this.totalPages = 1;
-
-    this._injectModel('AppStateModel', 'SubmissionModel');
   }
 
   /**
@@ -47,7 +51,9 @@ export default class OafSubmissionQuery extends Mixin(LitElement)
    * @description Query submissions based on current query string parameters
    */
   async query(){
-    const r = await this.SubmissionModel.query(this.AppStateModel.store.data.location.query);
+    this.resetState();
+    await this.qsCtl.queryIsSet;
+    const r = await this.SubmissionModel.query(this.qsCtl.getQuery(true));
     if ( r.state !== 'loaded' ) return;
     this.results = r.payload.results;
     this.page = r.payload.page;

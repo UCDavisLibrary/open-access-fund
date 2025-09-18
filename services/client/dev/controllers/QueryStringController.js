@@ -10,6 +10,9 @@ export default class QueryStringController {
     this.AppStateModel = Registry.getModel('AppStateModel');
     this.appComponentController = new AppComponentController(host);
     this.query = {};
+    this.scrollTo = null;
+
+    this.queryIsSet = Promise.resolve();
   }
 
   setParam(key, value){
@@ -22,20 +25,26 @@ export default class QueryStringController {
     this.host.requestUpdate();
   }
 
-  setLocation(){
-    let q = new URLSearchParams();
+  getQuery(asObject){
+    let q = {}
     for ( const key of Object.keys(this.query) ) {
       if ( this.types[key] === 'array' ) {
         if ( Array.isArray(this.query[key]) && this.query[key].length ) {
-          q.append(key, this.query[key].join(','));
+          q[key] = this.query[key].join(',');
         }
       } else if ( this.types[key] === 'boolean' ) {
-        if ( this.query[key] ) q.append(key, 'true');
+        if ( this.query[key] ) q[key] = 'true';
       } else {
-        if ( this.query[key] ) q.append(key, this.query[key]);
+        if ( this.query[key] ) q[key] = this.query[key];
       }
     }
-    const qs = q.toString();
+    if ( asObject ) return q;
+    const qp = new URLSearchParams(q);
+    return qp;
+  }
+
+  setLocation(){
+    const qs = this.getQuery().toString();
     this.AppStateModel.setLocation(`${this.AppStateModel.store.data.location.pathname}${qs ? '?'+qs : ''}`);
   }
 
@@ -54,20 +63,40 @@ export default class QueryStringController {
     this.query = q;
   }
 
-  _onAppStateUpdate(e) {
-    if ( !this.appComponentController.isOnActivePage ) return;
-    const q = JSON.parse(JSON.stringify(e.location?.query || {}));
-    this.resetQuery();
-    for ( const key of Object.keys(q) ) {
-      if ( this.types[key] === 'array' ) {
-        this.query[key] = q[key] ? q[key].split(',') : [];
-      } else if ( this.types[key] === 'boolean' ) {
-        this.query[key] = q[key] === 'false' ? false : true;
-      } else {
-        this.query[key] = q[key];
+  async _onAppStateUpdate(e) {
+
+    // create a promise that resolves when query is set
+    // important if want to use query in appStateUpdate handlers elsewhere
+    let resolveQueryIsSet;
+    const deferred = new Promise(res => { resolveQueryIsSet = res; });
+    this.queryIsSet = Promise.all([Promise.resolve(), deferred]).then(() => undefined);
+
+    // set query params based on location and default types
+    try {
+      if ( !this.appComponentController.isOnActivePage ) {
+        return;
       }
+      const q = e.location?.query || {};
+      this.resetQuery();
+      for ( const key of Object.keys(q) ) {
+        if ( key === 'scrollTo' ) {
+          this.scrollTo = q[key];
+          continue;
+        }
+        if ( this.types[key] === 'array' ) {
+          this.query[key] = q[key] ? q[key].split(',') : [];
+        } else if ( this.types[key] === 'boolean' ) {
+          this.query[key] = q[key] === 'false' ? false : true;
+        } else {
+          this.query[key] = q[key];
+        }
+      }
+      this.host.requestUpdate();
+
+    } finally {
+      // signal that query is set
+      resolveQueryIsSet?.();
     }
-    this.host.requestUpdate();
   }
 
   hostConnected() {

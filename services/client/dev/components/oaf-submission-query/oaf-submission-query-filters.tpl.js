@@ -6,6 +6,7 @@ export function styles() {
       display: block;
       container-type: inline-size;
       container-name: submission-filters;
+      margin-bottom: 1rem;
     }
     oaf-submission-query-filters .field-container {
       margin-bottom: 1rem;
