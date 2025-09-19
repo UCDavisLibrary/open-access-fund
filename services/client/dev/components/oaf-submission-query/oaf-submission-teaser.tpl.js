@@ -135,7 +135,7 @@ return html`
         ?hidden=${!this.submissionDate}>Submitted: ${this.submissionDate}
       </div>
     </div>
-    <a class="article-title">${this.submission.articleTitle || ''}</a>
+    <a class="article-title" href='/submission/${this.submission.submissionId}'>${this.submission.articleTitle || ''}</a>
     <div class='journal-info field' ?hidden=${!this.submission?.articleJournal}>
       <div class='field-first-line'>
         <cork-icon class='field-prefix' icon='fas.book'></cork-icon>

@@ -4,7 +4,7 @@ class Config {
     this.adminApp = {
       env: this._getEnv('ADMIN_APP_ENV').value === 'dev' ? 'dev' : 'prod',
       title: this._getEnv('ADMIN_APP_TITLE', 'UC Davis Open Access Fund Administration'),
-      routes: this._getEnv('ADMIN_APP_ROUTES', ['logout'], false, true),
+      routes: this._getEnv('ADMIN_APP_ROUTES', ['logout', 'submission'], false, true),
       ports: {
         host: this._getEnv('ADMIN_APP_HOST_PORT', 3000),
         container: this._getEnv('ADMIN_APP_CONTAINER_PORT', 3000)

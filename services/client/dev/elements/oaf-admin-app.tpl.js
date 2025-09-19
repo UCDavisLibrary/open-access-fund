@@ -23,6 +23,7 @@ export function render() {
         selected=${this.page}
         attr-for-selected='page-id'>
         ${renderSubmissionsQueryPage.call(this)}
+        <oaf-submission-single page-id='submission-single'></oaf-submission-single>
       </ucdlib-pages>
     </main>
 
