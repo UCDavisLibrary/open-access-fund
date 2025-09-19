@@ -79,6 +79,25 @@ class SubmissionService extends BaseService {
     return store.get(id);
   }
 
+  async statusCount() {
+    const ido = {action: 'statusCount'};
+    const id = payload.getKey(ido);
+    const store = this.store.data.statusCount;
+
+    await this.checkRequesting(
+      id, store,
+      () => this.request({
+        url : `${this.baseUrl}/submission-status/count`,
+        checkCached : () => store.get(id),
+        onUpdate : resp => this.store.set(
+          payload.generate(ido, resp),
+          store
+        )
+      })
+    );
+    return store.get(id);
+  }
+
 }
 
 const service = new SubmissionService();

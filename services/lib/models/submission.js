@@ -127,6 +127,17 @@ class Submission {
 
     return { res: { total, page, perPage, results, totalPages } };
   }
+
+  async getCountByStatus(){
+    const sql = `
+      SELECT ss.*, COUNT(s.submission_id)::int AS count
+      FROM submission_status ss
+      LEFT JOIN submission s ON s.submission_status_id = ss.status_id
+      GROUP BY ss.status_id
+      ORDER BY ss.created_at ASC;
+    `;
+    return pgClient.query(sql);
+  }
 }
 
 

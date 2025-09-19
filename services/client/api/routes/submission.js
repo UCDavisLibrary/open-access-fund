@@ -57,6 +57,28 @@ export default (app) => {
     }
   });
 
+  app.get('/submission-status/count', protect(), async (req, res) => {
+    try {
+      const result = await models.submission.getCountByStatus();
+      if ( result.error ) {
+        throw result.error;
+      }
+
+      const counts = result.res.rows.map(r => {
+        let out = {};
+        for ( const key in r ) {
+          out[textUtils.toCamelCase(key)] = r[key];
+        }
+        return out;
+      });
+
+      return res.status(200).json(counts);
+
+    } catch(e){
+      return handleError(res, req, e);
+    }
+  });
+
   app.get('/submission/query', protect(), validate(schema.submissionQuery), async (req, res) => {
     try {
       const result = await models.submission.query(req.validated);

@@ -248,7 +248,7 @@ class Migration {
       });
       return '';
     }
-    return app[fieldName].trim();
+    return app[fieldName].trim().replaceAll('&amp;', '&');
   }
 
   convertNumberField(app, fieldName){

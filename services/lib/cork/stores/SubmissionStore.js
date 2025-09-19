@@ -9,7 +9,8 @@ class SubmissionStore extends BaseStore {
     this.data = {
       submit: new LruStore({name: 'submission.submit'}),
       statusList: new LruStore({name: 'submission.statusList'}),
-      query: new LruStore({name: 'submission.query'})
+      query: new LruStore({name: 'submission.query'}),
+      statusCount: new LruStore({name: 'submission.statusCount'})
     };
     this.events = {};
 
@@ -19,6 +20,9 @@ class SubmissionStore extends BaseStore {
       },
       'submission.query': {
         message: 'Unable to query submissions'
+      },
+      'submission.statusCount': {
+        message: 'Unable to retrieve submission status counts'
       }
     }
   }

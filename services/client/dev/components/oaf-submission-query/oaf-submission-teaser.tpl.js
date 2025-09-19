@@ -75,7 +75,7 @@ export function styles() {
       margin-left: 1.5rem;
     }
     cork-icon.field-prefix {
-      color: var(--ucd-blue-100);
+      color: var(--ucd-blue-70);
     }
     @container (width > 700px) {
       .field .dot {
@@ -88,6 +88,30 @@ export function styles() {
       }
       .field-subsequent-line {
         margin-left: 0;
+      }
+      .author-department {
+        max-width: 400px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .author-name {
+        max-width: 300px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .journal-name {
+        max-width: 400px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .journal-publisher {
+        max-width: 300px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
     }
 
@@ -115,18 +139,18 @@ return html`
     <div class='journal-info field' ?hidden=${!this.submission?.articleJournal}>
       <div class='field-first-line'>
         <cork-icon class='field-prefix' icon='fas.book'></cork-icon>
-        <div>${this.submission?.articleJournal}</div>
+        <div class='journal-name'>${this.submission?.articleJournal}</div>
       </div>
       <div class='dot' ?hidden=${!this.submission?.articlePublisher}></div>
-      <div class='field-subsequent-line' ?hidden=${!this.submission?.articlePublisher}>${this.submission?.articlePublisher}</div>
+      <div class='field-subsequent-line journal-publisher' ?hidden=${!this.submission?.articlePublisher}>${this.submission?.articlePublisher}</div>
     </div>
     <div class='authors field' ?hidden=${!this.submission?.authorFullName}>
       <div class='field-first-line'>
         <cork-icon class='field-prefix' icon='fas.user'></cork-icon>
-        <div>${this.submission?.authorFullName}</div>
+        <div class='author-name'>${this.submission?.authorFullName}</div>
       </div>
       <div class='dot' ?hidden=${!this.submission?.authorDepartment}></div>
-      <div class='field-subsequent-line' ?hidden=${!this.submission?.authorDepartment}>${this.submission?.authorDepartment}</div>
+      <div class='field-subsequent-line author-department' ?hidden=${!this.submission?.authorDepartment}>${this.submission?.authorDepartment}</div>
     </div>
   </section>
 `;}

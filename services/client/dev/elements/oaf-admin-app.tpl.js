@@ -38,7 +38,9 @@ function renderSubmissionsQueryPage(){
         <div class="l-content">
           <oaf-submission-query></oaf-submission-query>
         </div>
-        <div class="l-sidebar-second"></div>
+        <div class="l-sidebar-second">
+          <oaf-status-subnav></oaf-status-subnav>
+        </div>
       </div>
     </div>
   `;
