@@ -47,6 +47,18 @@ class AuthModel extends BaseModel {
   }
 
   /**
+   * @description Checks if user has write access to the application
+   * @returns {boolean}
+   */
+  get userHasWriteAccess(){
+    return this.token?.hasWriteAccess;
+  }
+
+  get userId(){
+    return this.token?.id;
+  }
+
+  /**
    * @description Caches the user's access token on the server if they have basic access
    * @returns
    */

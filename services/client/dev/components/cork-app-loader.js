@@ -7,7 +7,8 @@ export default class CorkAppLoader extends Mixin(LitElement)
 
   static get properties() {
     return {
-      fadeDuration: {type: Number},
+      fadeInDuration: {type: Number},
+      fadeOutDuration: {type: Number},
       isDisplayed: {type: Boolean},
       _showPromise: {state: true},
       _hidePromise: {state: true}
@@ -21,7 +22,8 @@ export default class CorkAppLoader extends Mixin(LitElement)
   constructor() {
     super();
     this.render = render.bind(this);
-    this.fadeDuration = 250;
+    this.fadeInDuration = 1;
+    this.fadeOutDuration = 250;
 
     this._injectModel('AppStateModel');
   }
@@ -59,7 +61,7 @@ export default class CorkAppLoader extends Mixin(LitElement)
       {opacity: 0},
       {opacity: 1}
     ], {
-      duration: this.fadeDuration,
+      duration: this.fadeInDuration,
       easing: 'ease-in-out'
     });
     await animation.finished;
@@ -74,7 +76,7 @@ export default class CorkAppLoader extends Mixin(LitElement)
       {opacity: 1},
       {opacity: 0}
     ], {
-      duration: this.fadeDuration,
+      duration: this.fadeOutDuration,
       easing: 'ease-in-out'
     });
     await animation.finished;

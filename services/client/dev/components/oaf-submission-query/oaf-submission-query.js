@@ -5,6 +5,7 @@ import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-el
 
 import AppComponentController from '../../controllers/AppComponentController.js';
 import QueryStringController from '../../controllers/QueryStringController.js';
+import ScrollController from '../../controllers/ScrollController.js';
 
 export default class OafSubmissionQuery extends Mixin(LitElement)
   .with(LitCorkUtils, MainDomElement) {
@@ -27,6 +28,7 @@ export default class OafSubmissionQuery extends Mixin(LitElement)
 
     this.appComponentController = new AppComponentController(this);
     this.qsCtl = new QueryStringController(this, {types: {status: 'array'}});
+    this.scrollCtl = new ScrollController(this);
     this.resetState();
 
     this._injectModel('AppStateModel', 'SubmissionModel');
@@ -58,6 +60,12 @@ export default class OafSubmissionQuery extends Mixin(LitElement)
     this.results = r.payload.results;
     this.page = r.payload.page;
     this.totalPages = r.payload.totalPages;
+    await this.updateComplete;
+    if ( this.AppStateModel.store.data.lastPage !== this.AppStateModel.store.data.page ) {
+      this.scrollCtl.scrollToLastPagePosition();
+    } else {
+      this.scrollCtl.scrollToTopOfElement();
+    }
   }
 
   /**

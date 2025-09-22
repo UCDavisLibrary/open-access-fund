@@ -34,6 +34,11 @@ export default class AccessToken {
     return this._inRoleList('admin-access');
   }
 
+  get hasWriteAccess(){
+    if ( this.hasAdminAccess ) return true;
+    return this._inRoleList('write-access', ['resource']);
+  }
+
   /**
    * @description Returns list of roles assigned to user for this client
    */

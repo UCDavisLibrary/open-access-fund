@@ -15,6 +15,13 @@ const styles = `
   [hidden] {
     display: none !important;
   }
+  .bold {
+    font-weight: 700;
+  }
+  .small {
+    font-size: .875rem;
+  }
+
   ${sharedStyles}
   ${brandCssProps}
   ${fonts}

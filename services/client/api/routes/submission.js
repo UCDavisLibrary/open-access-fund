@@ -91,4 +91,20 @@ export default (app) => {
       return handleError(res, req, e);
     }
   });
+
+  app.get('/submission/:id', protect(), validate(schema.submissionGet), async (req, res) => {
+    try {
+      const result = await models.submission.get(req.validated.id);
+      if ( result.error ) {
+        throw result.error;
+      }
+      if ( !result.res ) {
+        return res.status(404).json({ message: 'Submission not found' });
+      }
+
+      return res.status(200).json(result.res);
+    } catch(e){
+      return handleError(res, req, e);
+    }
+  });
 };

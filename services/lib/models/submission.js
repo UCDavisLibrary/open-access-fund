@@ -61,6 +61,22 @@ class Submission {
     }
   }
 
+  /**
+   * @description Get a single submission by id
+   * @param {String} id - submission id
+   * @returns
+   */
+  async get(id){
+    const sql = `
+      SELECT submission_json
+      FROM submission_detailed_json_v
+      WHERE submission_id = $1;
+    `;
+    const r = await pgClient.query(sql, [id]);
+    if ( r.error ) return r;
+    return { res: r.res.rows?.[0]?.submission_json || null };
+  }
+
   async query(params={}){
     const perPage = parseInt(config.adminApp.submissionPaginationSize.value);
     const page = params.page || 1;

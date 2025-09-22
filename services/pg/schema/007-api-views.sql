@@ -16,6 +16,7 @@ select
     'authorPhone', s.author_phone,
     'financialContactFirstName', s.financial_contact_first_name,
     'financialContactLastName',  s.financial_contact_last_name,
+    'financialContactFullName',  s.financial_contact_full_name,
     'financialContactEmail',     s.financial_contact_email,
     'financialContactPhone',     s.financial_contact_phone,
     'fundAccount', s.fund_account,

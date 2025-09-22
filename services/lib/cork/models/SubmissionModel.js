@@ -33,6 +33,10 @@ class SubmissionModel extends BaseModel {
     return this.service.statusCount();
   }
 
+  async get(id) {
+    return this.service.get(id);
+  }
+
 }
 
 const model = new SubmissionModel();

@@ -31,6 +31,7 @@ import '../../../lib/cork/models/SubmissionModel.js';
 import '../../../lib/cork/models/ValidationModel.js';
 
 import Keycloak from 'keycloak-js';
+import ScrollController from '../controllers/ScrollController.js';
 
 Registry.ready();
 
@@ -55,6 +56,8 @@ export default class OafAdminApp extends Mixin(LitElement)
     this._firstAppStateUpdate = false;
 
     this._injectModel('AppStateModel', 'AuthModel');
+
+    this.scrollCtl = new ScrollController(this, {attachListener: true});
   }
 
   /**

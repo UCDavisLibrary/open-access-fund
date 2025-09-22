@@ -185,10 +185,13 @@ class Migration {
 
     // parse fund account
     if ( bigsysApp.fund_account?.trim?.() ) {
+      let missingFundAccountType = false;
       const fundAccountString = bigsysApp.fund_account.replace('(POET)', '').replace('(GL)', '').trim();
       try {
         fundAccountUtils.parse(fundAccountString);
       } catch (error) {
+        missingFundAccountType = true;
+        submission.fund_account.bigsysValueInvalid = true;
         this.addWarning(bigsysApp.id, {
           type: 'INVALID_FUND_ACCOUNT',
           field: 'fund_account',
@@ -196,19 +199,24 @@ class Migration {
           bigsysValue: bigsysApp.fund_account
         });
       }
-      submission.fund_account.fundType = fundAccountUtils.fundType;
-      submission.fund_account.parts = fundAccountUtils.fundAccountParts;
-      const validation = fundAccountUtils.validate();
-      if ( !validation.valid ) {
-        this.addWarning(bigsysApp.id, {
-          type: 'FUND_ACCOUNT_VALIDATION_ERRORS',
-          field: 'fund_account',
-          errors: validation.errors,
-          bigsysValue: bigsysApp.fund_account
-        });
+      if ( !missingFundAccountType ){
+        submission.fund_account.fundType = fundAccountUtils.fundType;
+        submission.fund_account.parts = fundAccountUtils.fundAccountParts;
+        const validation = fundAccountUtils.validate();
+        if ( !validation.valid ) {
+          this.addWarning(bigsysApp.id, {
+            type: 'FUND_ACCOUNT_VALIDATION_ERRORS',
+            field: 'fund_account',
+            errors: validation.errors,
+            bigsysValue: bigsysApp.fund_account
+          });
+          submission.fund_account.bigsysValueInvalid = true;
+        }
       }
 
+
     } else {
+      submission.fund_account.bigsysValueInvalid = true;
       this.addWarning(bigsysApp.id, {
         type: 'MISSING_FUND_ACCOUNT',
         field: 'fund_account'

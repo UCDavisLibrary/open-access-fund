@@ -20,6 +20,16 @@ class DataDefinitions {
       {value: 'other', label: 'Other'}
     ];
   }
+
+  static getLabel(list, value) {
+    if ( typeof list === 'string' ) {
+      if ( typeof DataDefinitions[list] === 'object' ) {
+        list = DataDefinitions[list];
+      }
+    }
+    const item = list.find(i => i.value === value);
+    return item ? item.label : value;
+  }
 }
 
 export { DataDefinitions };
