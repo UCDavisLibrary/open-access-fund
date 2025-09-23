@@ -55,7 +55,8 @@ class Config {
         submission: 'submission',
         submissionStatus: 'submission_status',
         userComment: 'user_comment',
-        submissionTransaction: 'submission_transaction'
+        submissionTransaction: 'submission_transaction',
+        user: 'app_user'
       }
     }
 

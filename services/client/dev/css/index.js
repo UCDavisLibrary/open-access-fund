@@ -6,6 +6,7 @@ import fonts from './fonts.css';
 // mainDomElement styles from lit elements
 // if done in the element itself, it creates a style tag for each instance
 import { styles as oafStatusSubnavStyles } from '../components/oaf-status-subnav.tpl.js';
+import { styles as corkFieldContainerStyles } from '../components/cork-field-container.tpl.js';
 
 function getLitStyles(styles){
   return styles().map(s => s.cssText).join('\n');
@@ -26,6 +27,7 @@ const styles = `
   ${brandCssProps}
   ${fonts}
   ${getLitStyles(oafStatusSubnavStyles)}
+  ${getLitStyles(corkFieldContainerStyles)}
 `;
 
 let sharedStyleElement = document.createElement('style');

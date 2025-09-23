@@ -18,6 +18,8 @@ import '../components/cork-app-loader.js';
 import '../components/oaf-submission-query/oaf-submission-query.js';
 import '../components/oaf-status-subnav.js';
 import '../components/oaf-submission-single/oaf-submission-single.js';
+import '../components/cork-app-toast.js';
+import '../components/cork-field-container.js';
 
 import { Registry, LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-element.js";

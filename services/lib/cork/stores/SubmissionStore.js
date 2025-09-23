@@ -11,7 +11,9 @@ class SubmissionStore extends BaseStore {
       statusList: new LruStore({name: 'submission.statusList'}),
       query: new LruStore({name: 'submission.query'}),
       statusCount: new LruStore({name: 'submission.statusCount'}),
-      get: new LruStore({name: 'submission.get'})
+      get: new LruStore({name: 'submission.get'}),
+      commentCreate: new LruStore({name: 'submission.commentCreate'}),
+      commentUpdate: new LruStore({name: 'submission.commentUpdate'})
     };
     this.events = {};
 
@@ -27,6 +29,14 @@ class SubmissionStore extends BaseStore {
       },
       'submission.get': {
         message: 'Unable to retrieve submission'
+      },
+      'submission.commentCreate': {
+        message: 'Unable to create comment',
+        showToast: true
+      },
+      'submission.commentUpdate': {
+        message: 'Unable to update comment',
+        showToast: true
       }
     }
   }

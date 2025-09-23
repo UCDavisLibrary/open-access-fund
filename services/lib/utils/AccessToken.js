@@ -84,6 +84,42 @@ export default class AccessToken {
     return this.token.email || '';
   }
 
+  get dbUpsertObject(){
+    return {
+      kerberos: this.id,
+      email: this.email,
+      first_name: this.givenName,
+      last_name: this.familyName
+    }
+  }
+
+  /**
+   * @description Returns full name of logged in user
+   */
+  get fullName(){
+    if ( this.token.name ) return this.token.name;
+    if ( this.token.given_name || this.token.family_name ) {
+      return `${this.token.given_name || ''} ${this.token.family_name || ''}`.trim();
+    }
+    return '';
+  }
+
+  get givenName(){
+    return this.token.given_name || '';
+  }
+  get familyName(){
+    return this.token.family_name || '';
+  }
+
+  /**
+   * @description Returns initials of logged in user
+   */
+  get initials(){
+    const name = this.fullName;
+    if ( !name ) return '';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  }
+
   /**
    * @description Check if user has a role, either assigned to the realm or to this client
    * @param {String} role - The role to check for

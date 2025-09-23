@@ -83,6 +83,7 @@ select
                       'transactionType',     t.transaction_type,
                       'transactionSubtype',  t.transaction_subtype,
                       'previousStatus',      t.previous_status,
+                      'details',             t.details,
                       'userComment',
                         case when tuc.user_comment_id is null then null else jsonb_build_object(
                           'userCommentId', tuc.user_comment_id,

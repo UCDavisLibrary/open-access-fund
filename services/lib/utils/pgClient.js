@@ -60,19 +60,23 @@ class PgClient {
    * @param {Boolean} useOr - Use OR instead of AND
    * @returns {Object} {sql: 'foo = $1 AND bar = $2', values: ['fooValue', 'barValue]}
    */
-  toWhereClause(queryObject, useOr=false){
-    return this._toEqualsClause(queryObject, useOr ? ' OR ' : ' AND ');
+  toWhereClause(queryObject, useOr=false, indexStart=0){
+    return this._toEqualsClause(queryObject, useOr ? ' OR ' : ' AND ', indexStart);
   }
 
   /**
    * @description Converts an object to parameters of a UPDATE clause
    * @param {Object} queryObject - key value pairs for clause
-   * @param {Boolean} underscore - Convert keys to underscore
+   * @param {Object} kwargs - Optional arguments
+   * @param {Array} kwargs.includeFields - Fields to include. Takes precedence over excludeFields
+   * @param {Array} kwargs.excludeFields - Fields to exclude
+   * @param {Number} kwargs.indexStart - The starting index for the $ placeholders. Default 0.
    * @returns {Object} {sql: 'foo = $1, bar = $2', values: ['fooValue', 'barValue]}
    */
   toUpdateClause(queryObject, kwargs){
     queryObject = this._filterObject(queryObject, kwargs?.includeFields, kwargs?.excludeFields);
-    return this._toEqualsClause(queryObject, ', ');
+    const indexStart = kwargs?.indexStart || 0;
+    return this._toEqualsClause(queryObject, ', ', indexStart);
   }
 
   prepareObjectForUpdate(obj, kwargs){

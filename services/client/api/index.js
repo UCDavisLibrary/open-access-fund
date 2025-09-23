@@ -2,6 +2,7 @@ import express from 'express';
 import { iconApiMiddleware } from '@ucd-lib/cork-icon';
 
 import auth from './routes/auth.js';
+import comment from './routes/comment.js';
 import configRoutes from './routes/configRoutes.js';
 import submission from './routes/submission.js';
 
@@ -32,6 +33,7 @@ export default (app) => {
 
   // routes
   auth(router);
+  comment(router);
   configRoutes(router);
   submission(router);
   router.use('/icon', protect(), iconApiMiddleware({iconsets}));

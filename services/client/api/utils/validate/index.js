@@ -3,6 +3,7 @@ import submissionSchema from './schemas/submission.js';
 import submissionStatusQuerySchema from './schemas/submissionStatusQuery.js';
 import submissionQuerySchema from './schemas/submissionQuery.js';
 import submissionGetSchema from './schemas/submissionGet.js';
+import commentSchema from './schemas/comment.js';
 
 /**
  * @description Middleware to validate request data against a Zod schema.
@@ -47,6 +48,7 @@ function formatErrorResponse(zodError) {
 }
 
 const schema = {
+  comment: commentSchema,
   submission: submissionSchema,
   submissionStatusQuery: submissionStatusQuerySchema,
   submissionQuery: submissionQuerySchema,

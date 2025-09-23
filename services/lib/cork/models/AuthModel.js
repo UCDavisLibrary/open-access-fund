@@ -58,6 +58,10 @@ class AuthModel extends BaseModel {
     return this.token?.id;
   }
 
+  get userInitials(){
+    return this.token?.initials;
+  }
+
   /**
    * @description Caches the user's access token on the server if they have basic access
    * @returns

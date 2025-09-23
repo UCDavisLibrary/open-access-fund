@@ -39,7 +39,7 @@ class Migration {
       // library comment
       const libraryComments = app.library_notes?.trim();
       if ( libraryComments ) {
-        const commentResult = await models.userComment.create({
+        const commentResult = await models.comment.create({
           submission_id: result.res.submissionId,
           comment_text: libraryComments
         });

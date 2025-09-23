@@ -18,6 +18,7 @@ export default class BaseStoreImp extends BaseStore {
       AppStateModel.removeLoadingRequest({payload})
     } else if ( payload.state === STATES.ERROR) {
       let errorSettings = this.errorSettings?.[store.name];
+      AppStateModel.removeLoadingRequest({payload});
       AppStateModel.addErrorRequest({payload, errorSettings});
     }
   }

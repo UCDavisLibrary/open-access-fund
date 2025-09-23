@@ -117,6 +117,56 @@ class SubmissionService extends BaseService {
     return store.get(key);
   }
 
+  async createComment(data) {
+    const ido = {action: 'commentCreate'};
+    const store = this.store.data.commentCreate;
+    const key = payload.getKey(ido);
+
+    await this.checkRequesting(
+      key, store,
+      () => this.request({
+        url : `${this.baseUrl}/comment`,
+        fetchOptions: {
+          method : 'POST',
+          body: JSON.stringify(data),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        },
+        onUpdate : resp => this.store.set(
+          payload.generate(ido, resp),
+          store
+        )
+      })
+    );
+    return store.get(key);
+  }
+
+  async updateComment(data) {
+    const ido = {action: 'commentUpdate'};
+    const store = this.store.data.commentUpdate;
+    const key = payload.getKey(ido);
+
+    await this.checkRequesting(
+      key, store,
+      () => this.request({
+        url : `${this.baseUrl}/comment`,
+        fetchOptions: {
+          method : 'POST',
+          body: JSON.stringify(data),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        },
+        onUpdate : resp => this.store.set(
+          payload.generate(ido, resp),
+          store
+        )
+      })
+    );
+    return store.get(key);
+  }
+
 }
 
 const service = new SubmissionService();

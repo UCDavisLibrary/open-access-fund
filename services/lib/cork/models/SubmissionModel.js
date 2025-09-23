@@ -37,6 +37,30 @@ class SubmissionModel extends BaseModel {
     return this.service.get(id);
   }
 
+  async createComment(data) {
+    const r = await this.service.createComment(data);
+    this.ValidationModel.notify('comment', r);
+    if ( r?.state === 'loaded' ){
+      this.clearCache();
+    }
+    return r;
+  }
+
+  async updateComment(data) {
+    const r = await this.service.updateComment(data);
+    this.ValidationModel.notify('comment', r);
+    if ( r?.state === 'loaded' ){
+      this.clearCache();
+    }
+    return r;
+  }
+
+  clearCache(){
+    this.store.data.get.purge();
+    this.store.data.query.purge();
+    this.store.data.statusCount.purge();
+  }
+
 }
 
 const model = new SubmissionModel();

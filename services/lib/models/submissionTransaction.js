@@ -4,47 +4,49 @@ import config from '../utils/config.js';
 class SubmissionTransaction {
 
   async create(data, client){
-    let values = [
-      data.submission_id,
-      data.transaction_type,
-      data.user_comment_id,
-      data.details,
-      data.created_at,
-      data.app_user_id,
-      data.transaction_subtype,
-      data.previous_status
-    ];
-    let params = [
-      '$1', '$2', '$3', '$4', '$5'
-    ];
+    let values = [];
+    let params = [];
+    let columns = [];
 
+    // standard fields
+    const fields = ['submission_id', 'transaction_type', 'user_comment_id', 'details', 'created_at'];
+    for ( const field of fields ){
+      if ( data[field] ){
+        values.push(data[field]);
+        params.push(`$${values.length}`);
+        columns.push(field);
+      }
+    }
+
+    // special cases
     if ( data.app_user_id ){
-      params.push('get_app_user_id($6)');
-    } else {
-      params.push('$6');
+      params.push(`get_app_user_id($${values.length + 1})`);
+      values.push(data.app_user_id);
+      columns.push('app_user_id');
     }
 
     if ( data.transaction_type === 'status-update' ){
-      params.push('get_submission_status_id($7)');
+      params.push(`get_submission_status_id($${values.length + 1})`);
+      values.push(data.transaction_subtype);
+      columns.push('transaction_subtype');
     } else {
-      params.push('$7');
+      params.push(`$${values.length + 1}`);
+      values.push(data.transaction_subtype);
+      columns.push('transaction_subtype');
     }
 
     if ( data.previous_status ){
-      params.push('get_submission_status_id($8)');
+      params.push(`get_submission_status_id($${values.length + 1})`);
+      values.push(data.previous_status);
+      columns.push('previous_status');
     } else {
-      params.push('$8');
+      params.push(`$${values.length + 1}`);
+      values.push(data.previous_status);
+      columns.push('previous_status');
     }
 
     let sql = `INSERT INTO ${config.db.tables.submissionTransaction} (
-      submission_id,
-      transaction_type,
-      user_comment_id,
-      details,
-      created_at,
-      app_user_id,
-      transaction_subtype,
-      previous_status
+      ${columns.join(', ')}
     ) VALUES (${params.join(', ')}) RETURNING transaction_id
     ` ;
 
@@ -61,6 +63,15 @@ class SubmissionTransaction {
       const transactionId = result.res.rows[0].transaction_id;
       return { res: { transactionId } };
     }
+  }
+
+  async get(id) {
+    const sql = `SELECT * FROM ${config.db.tables.submissionTransaction} WHERE transaction_id=$1`;
+    const values = [id];
+    const result = await pgClient.query(sql, values);
+    if ( result.error ) return result;
+    if ( result.res.rows.length === 0 ) return { res: null };
+    return { res: result.res.rows[0] };
   }
 }
 

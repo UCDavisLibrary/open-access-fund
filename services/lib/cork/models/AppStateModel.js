@@ -73,8 +73,16 @@ class AppStateModelImpl extends AppStateModel {
 
     this._showErrorTimer = setTimeout(() => {
       this._showErrorTimer = null;
-      this.showError({requests: this.errorRequests});
+      const fullPageErrors = this.errorRequests.filter(r => !r.errorSettings?.showToast);
+      const toastErrors = this.errorRequests.filter(r => r.errorSettings?.showToast);
       this.errorRequests = [];
+      if ( fullPageErrors.length ){
+        this.showError({requests: fullPageErrors});
+      }
+      toastErrors.forEach(r => {
+        let message = r.errorSettings?.message || 'An error occurred';
+        this.showToast({text: message, type: 'error'});
+      });
     }, 100);
 
   }
