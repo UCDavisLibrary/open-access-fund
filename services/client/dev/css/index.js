@@ -2,6 +2,7 @@
 import sharedStyles from '@ucd-lib/theme-sass/style-ucdlib.css';
 import brandCssProps from '@ucd-lib/theme-sass/css-properties.css';
 import fonts from './fonts.css';
+import headings from './headings.css';
 
 // mainDomElement styles from lit elements
 // if done in the element itself, it creates a style tag for each instance
@@ -26,6 +27,7 @@ const styles = `
   ${sharedStyles}
   ${brandCssProps}
   ${fonts}
+  ${headings}
   ${getLitStyles(oafStatusSubnavStyles)}
   ${getLitStyles(corkFieldContainerStyles)}
 `;

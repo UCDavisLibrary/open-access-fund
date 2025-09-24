@@ -26,6 +26,7 @@ export function styles() {
       margin-bottom: .5rem;
       border-left: 4px solid var(--ucd-blue-60);
       padding-left: 1rem;
+      white-space: pre-line;
     }
     .comment-meta {
       font-size: .875rem;
@@ -135,7 +136,7 @@ return html`
           @input=${e => this.writeInputValue = e.target.value}>
         </textarea>
       </cork-field-container>
-      <div>
+      <div class='buttons'>
         <button class='btn btn--primary' @click=${this._onWriteSubmit}>${this.editedCommentId ? 'Update' : 'Submit'}</button>
         <button class='btn btn--invert' @click=${this._onWriteCancel}>Cancel</button>
       </div>

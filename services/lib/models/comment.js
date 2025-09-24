@@ -3,10 +3,16 @@ import config from '../utils/config.js';
 import models from './index.js';
 
 class Comment {
-  async create(commentData, userData) {
-    const client = await pgClient.pool.connect();
+  async create(commentData, userData, noTransaction, client) {
+    let isDedicatedClient = false;
+    if ( !client ) {
+      isDedicatedClient = true;
+      client = await pgClient.pool.connect();
+    }
     try {
-      await client.query('BEGIN');
+      if ( isDedicatedClient ) {
+        await client.query('BEGIN');
+      }
 
       let userId;
       if ( userData ){
@@ -24,31 +30,46 @@ class Comment {
       const userCommentId = result.rows[0].user_comment_id;
 
       // transaction log
-      const transactionData = {
-        submission_id: commentData.submission_id,
-        transaction_type: 'comment',
-        app_user_id: userId,
-        transaction_subtype: 'create',
-        user_comment_id: userCommentId
-      };
-      await models.submissionTransaction.create(transactionData, client);
+        if ( !noTransaction ) {
+        const transactionData = {
+          submission_id: commentData.submission_id,
+          transaction_type: 'comment',
+          app_user_id: userId,
+          transaction_subtype: 'create',
+          user_comment_id: userCommentId
+        };
+        await models.submissionTransaction.create(transactionData, client);
+      }
 
-
-      await client.query('COMMIT');
+      if ( isDedicatedClient ) {
+        await client.query('COMMIT');
+      }
 
       return { res: { userCommentId } };
     } catch (error) {
-      await client.query('ROLLBACK');
-      return { error };
+      if ( isDedicatedClient ) {
+        await client.query('ROLLBACK');
+        return { error };
+      } else {
+        throw error;
+      }
     } finally {
-      client.release();
+      if ( isDedicatedClient ) {
+        client.release();
+      }
     }
   }
 
-  async update(commentId, commentText) {
-    const client = await pgClient.pool.connect();
+  async update(commentId, commentText, client) {
+    let isDedicatedClient = false;
+    if ( !client ) {
+      isDedicatedClient = true;
+      client = await pgClient.pool.connect();
+    }
     try {
-      await client.query('BEGIN');
+      if ( isDedicatedClient ) {
+        await client.query('BEGIN');
+      }
 
       let existingComment = await this.get(commentId);
       existingComment = existingComment.res;
@@ -71,14 +92,22 @@ class Comment {
       };
       await models.submissionTransaction.create(transactionData, client);
 
-      await client.query('COMMIT');
+      if ( isDedicatedClient ) {
+        await client.query('COMMIT');
+      }
 
       return { res: { success: true } };
     } catch (error) {
-      await client.query('ROLLBACK');
-      return { error };
+      if ( isDedicatedClient ) {
+        await client.query('ROLLBACK');
+        return { error };
+      } else {
+        throw error;
+      }
     } finally {
-      client.release();
+      if ( isDedicatedClient ) {
+        client.release();
+      }
     }
   }
 

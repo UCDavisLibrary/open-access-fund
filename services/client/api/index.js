@@ -18,7 +18,7 @@ const iconsets = [
     preload: [
       'check', 'xmark', 'plug-circle-exclamation', 'book', 'user',
       'pen-to-square', 'envelope', 'phone', 'money-bill', 'building-columns',
-      'comments'
+      'comments', 'spinner', 'circle-check', 'circle-xmark', 'circle-question'
     ]
   },
   { name: 'fontawesome-6.7-regular', aliases: ['far']},

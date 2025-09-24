@@ -2,6 +2,7 @@ import { html, css } from 'lit';
 import './oaf-form-section.js';
 
 import './oaf-comments.js';
+import './oaf-status.js';
 
 import { DataDefinitions } from '../../../../lib/utils/DataDefinitions.js';
 
@@ -70,7 +71,7 @@ return html`
   </ol>
   <div class="l-container l-basic--flipped">
     <div class="l-sidebar-first">
-      <p>sidebar</p>
+      <oaf-status></oaf-status>
     </div>
     <div class="l-content">
       ${_renderAuthorInfo.call(this)}

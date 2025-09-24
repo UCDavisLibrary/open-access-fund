@@ -19,6 +19,7 @@ export function render() {
     <cork-app-error></cork-app-error>
     <cork-app-loader></cork-app-loader>
     <cork-app-toast></cork-app-toast>
+    <cork-app-dialog-modal></cork-app-dialog-modal>
     <main>
       <ucdlib-pages
         selected=${this.page}

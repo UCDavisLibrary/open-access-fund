@@ -107,6 +107,7 @@ class AppStateModelImpl extends AppStateModel {
 
   refresh(){
     const state = this.store.data;
+    this.set(state);
     this.store.emit(this.store.events.APP_STATE_UPDATE, state);
   }
 
@@ -157,6 +158,7 @@ class AppStateModelImpl extends AppStateModel {
    * - actionCallback {Function} - A callback function to run when the action is clicked (optional).
    *     The function will be passed the action object and the modal element instance.
    *     The function should return an object with an abortModalAction property set to true to prevent the modal from closing.
+   * - reloadLast {Boolean} - If true, will reload the last dialog content, title, actions, and data instead of using the passed in options (optional)
    *
    * If the actions array is empty, a 'Dismiss' button will be added automatically
    */
@@ -174,6 +176,14 @@ class AppStateModelImpl extends AppStateModel {
       options.content = '';
     }
     this.store.emit('app-dialog-open', options);
+  }
+
+  closeDialogModal(){
+    this.store.emit('app-dialog-close');
+  }
+
+  requestDialogUpdate(){
+    this.store.emit('app-dialog-update-request');
   }
 
   /**

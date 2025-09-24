@@ -24,20 +24,26 @@ export default class ScrollController {
     return SCROLL_STATE.scrollY;
   }
 
+  get lastPagePosition(){
+    const currentPage = this.AppStateModel.store?.data?.page;
+    if ( !currentPage ) return null;
+    const hist = SCROLL_STATE.history;
+    for ( let i = hist.length-1; i >= 0; i-- ) {
+      if ( hist[i].page === currentPage ) {
+        return hist[i].scrollY;
+      }
+    }
+    return null;
+  }
+
   /**
    * @description Scroll to last known scroll position for the current page
    * @returns
    */
   scrollToLastPagePosition(){
-    const currentPage = this.AppStateModel.store?.data?.page;
-    if ( !currentPage ) return;
-    const hist = SCROLL_STATE.history;
-    for ( let i = hist.length-1; i >= 0; i-- ) {
-      if ( hist[i].page === currentPage ) {
-        window.scrollTo(0, hist[i].scrollY);
-        return;
-      }
-    }
+    const pos = this.lastPagePosition;
+    if ( pos === null ) return;
+    window.scrollTo(0, pos);
   }
 
   /**
@@ -92,6 +98,7 @@ export default class ScrollController {
    */
   _onAppStateUpdate(e) {
     if ( !e.lastPage ) return;
+    if ( !SCROLL_STATE.scrollY ) return;
     SCROLL_STATE.history.push({page: e.lastPage, scrollY: SCROLL_STATE.scrollY});
     if ( SCROLL_STATE.history.length > 20 ) SCROLL_STATE.history.shift();
   }

@@ -4,6 +4,7 @@ import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-element.js";
 
 import AppComponentController from '../../controllers/AppComponentController.js';
+import ScrollController from '../../controllers/ScrollController.js';
 import fundAccountUtils from '../../../../lib/utils/fundAccountUtils.js';
 
 export default class OafSubmissionSingle extends Mixin(LitElement)
@@ -15,7 +16,8 @@ export default class OafSubmissionSingle extends Mixin(LitElement)
       submissionListUrl: {state: true},
       data: {state: true},
       displayTitle: {state: true},
-      fundAccountString: {state: true}
+      fundAccountString: {state: true},
+      noScrollOnUpdate: { state: true }
     }
   }
 
@@ -30,6 +32,8 @@ export default class OafSubmissionSingle extends Mixin(LitElement)
     this.data = null;
 
     this.appComponentController = new AppComponentController(this);
+    this.scrollCtl = new ScrollController(this);
+    this.noScrollOnUpdate = false;
 
     this._injectModel('AppStateModel', 'SubmissionModel');
   }
@@ -61,11 +65,9 @@ export default class OafSubmissionSingle extends Mixin(LitElement)
    * Handle application state updates
    * @returns
    */
-  _onAppStateUpdate(e) {
+  async _onAppStateUpdate(e) {
     if ( !this.appComponentController.isOnActivePage ) return;
     this.submissionId = e.location.path[1];
-
-    this.getSubmission();
 
     // for breadcrumb link back to submission list
     if ( e.lastPage === 'home') {
@@ -74,6 +76,13 @@ export default class OafSubmissionSingle extends Mixin(LitElement)
     } else {
       this.submissionListUrl = '/';
     }
+
+    await this.getSubmission();
+
+    if ( !this.noScrollOnUpdate ){
+      this.scrollCtl.scrollToTop();
+    }
+    this.noScrollOnUpdate = false;
   }
 
   async getSubmission(){
@@ -82,6 +91,14 @@ export default class OafSubmissionSingle extends Mixin(LitElement)
     this.data = r.payload;
   }
 
+  _onSubmissionCommentcreateUpdate(e){
+    this.noScrollOnUpdate = true;
+  }
+
+  _onSubmissionCommentupdateUpdate(e){
+    if ( e.state !== 'loaded' ) return;
+    this.noScrollOnUpdate = true;
+  }
 
 }
 

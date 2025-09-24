@@ -29,9 +29,7 @@ export default class OafComments extends Mixin(LitElement)
     this.render = render.bind(this);
     this.submissionId = null;
     this.submission = null;
-    this.showWriteInput = false;
-    this.editedCommentId = null;
-    this.writeInputValue = '';
+    this.resetFormState();
 
     this.appComponentController = new AppComponentController(this);
     this.scrollCtl = new ScrollController(this);
@@ -47,10 +45,12 @@ export default class OafComments extends Mixin(LitElement)
     this.updateSuccessful = false;
   }
 
-  _onAppStateUpdate() {
+  async _onAppStateUpdate() {
     if ( !this.appComponentController.isOnActivePage ) return;
     this.getSubmission();
     if ( this.updateSuccessful ) {
+      await this.waitCtl.waitForUpdate();
+      await this.waitCtl.waitForFrames(3);
       this.scrollCtl.scrollToLastPagePosition();
     }
     this.resetFormState();
@@ -76,19 +76,25 @@ export default class OafComments extends Mixin(LitElement)
     this.showWriteInput = true;
     this.editedCommentId = comment.userCommentId;
     this.writeInputValue = comment.commentText;
-
-    await this.waitCtl.waitForUpdate();
-    await this.waitCtl.waitForFrames(3);
-    this.renderRoot.querySelector('textarea')?.focus();
+    await this.focusWriteInput();
   }
 
   async _onAddClick() {
     this.showWriteInput = true;
     this.editedCommentId = null;
     this.writeInputValue = '';
+    await this.focusWriteInput();
+  }
+
+  async focusWriteInput() {
     await this.waitCtl.waitForUpdate();
     await this.waitCtl.waitForFrames(3);
     this.renderRoot.querySelector('textarea')?.focus();
+
+    const buttonsEl = this.renderRoot.querySelector('.write-input-container .buttons');
+    if (buttonsEl) {
+      buttonsEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   }
 
   async _onWriteSubmit() {

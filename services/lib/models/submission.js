@@ -154,6 +154,18 @@ class Submission {
     `;
     return pgClient.query(sql);
   }
+
+  async submissionIsStatus(id, statusIdOrName){
+    const sql = `
+      SELECT COUNT(*)::int AS count
+      FROM submission s
+      WHERE s.submission_id = $1
+      AND s.submission_status_id = get_submission_status_id($2);
+    `;
+    const r = await pgClient.query(sql, [id, statusIdOrName]);
+    if ( r.error ) return r;
+    return { res: r.res.rows?.[0]?.count === 1 };
+  }
 }
 
 

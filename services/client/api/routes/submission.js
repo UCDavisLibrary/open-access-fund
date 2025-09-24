@@ -4,6 +4,7 @@ import textUtils from '../../../lib/utils/textUtils.js';
 import models from '../../../lib/models/index.js';
 import validateRecaptcha from '../utils/recaptcha.js';
 import { validate, schema } from '../utils/validate/index.js';
+import pgClient from '../../../lib/utils/pgClient.js';
 import protect from '../utils/protect.js';
 
 
@@ -103,6 +104,23 @@ export default (app) => {
       }
 
       return res.status(200).json(result.res);
+    } catch(e){
+      return handleError(res, req, e);
+    }
+  });
+
+  app.post('/submission/:id/status', protect('hasWriteAccess'), validate(schema.statusUpdate), async (req, res) => {
+    try {
+      // checkout client
+
+      // status update with transaction
+
+      // write comment, if provided. no transaction log needed, as it's part of status update transaction
+
+      // update non-status submission properties, if provided (award amount, accounting system number) with transactions
+
+      // send email, if not disabled
+      return res.status(200).json({ message: 'Not implemented' });
     } catch(e){
       return handleError(res, req, e);
     }

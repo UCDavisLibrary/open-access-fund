@@ -12,7 +12,6 @@ export default class OafSubmissionQueryFilters extends Mixin(LitElement)
 
   static get properties() {
     return {
-      statusListQuery: {state: true},
       statusOptions: {state: true}
     }
   }
@@ -26,7 +25,6 @@ export default class OafSubmissionQueryFilters extends Mixin(LitElement)
     this.appComponentController = new AppComponentController(this);
     this.qsCtl = new QueryStringController(this, {types: {status: 'array'}});
 
-    this.statusListQuery = {excludeArchived: true};
     this.statusOptions = [];
 
     this.render = render.bind(this);
@@ -36,14 +34,13 @@ export default class OafSubmissionQueryFilters extends Mixin(LitElement)
 
   _onAppStateUpdate(e) {
     if ( !this.appComponentController.isOnActivePage ) return;
-    this.SubmissionModel.statusList(this.statusListQuery);
+    this.getStatusOptions();
   }
 
-  _onSubmissionStatuslistUpdate(e) {
-    if ( !this.appComponentController.isOnActivePage || e.state !== 'loaded' ) return;
-    const id = payloadUtils.getKey({action: 'statusList', ...this.statusListQuery});
-    if ( id !== e.id ) return;
-    this.statusOptions = JSON.parse(JSON.stringify(e.payload));
+  async getStatusOptions(){
+    const r = await this.SubmissionModel.statusList({excludeArchived: true});
+    if ( r.state !== 'loaded' ) return;
+    this.statusOptions = JSON.parse(JSON.stringify(r.payload));
   }
 
   _onFilterUpdate(filter, value){

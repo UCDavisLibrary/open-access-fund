@@ -167,6 +167,30 @@ class SubmissionService extends BaseService {
     return store.get(key);
   }
 
+  async updateStatus(id, data) {
+    const ido = {id};
+    const store = this.store.data.statusUpdate;
+    const key = payload.getKey(ido);
+    await this.checkRequesting(
+      key, store,
+      () => this.request({
+        url : `${this.baseUrl}/submission/${id}/status`,
+        fetchOptions: {
+          method : 'POST',
+          body: JSON.stringify(data),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        },
+        onUpdate : resp => this.store.set(
+          payload.generate(ido, resp),
+          store
+        )
+      })
+    );
+    return store.get(key);
+  }
+
 }
 
 const service = new SubmissionService();
