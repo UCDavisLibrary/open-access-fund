@@ -4,6 +4,8 @@ import './oaf-form-section.js';
 import './oaf-comments.js';
 import './oaf-status.js';
 
+import * as submissionFields from '../../templates/submissionFields.js';
+
 import { DataDefinitions } from '../../../../lib/utils/DataDefinitions.js';
 
 export function styles() {
@@ -84,7 +86,13 @@ return html`
 
 function _renderAuthorInfo() {
   return html`
-    <oaf-form-section heading-icon="fas.user" heading-text="Author Information" brand-color='pinot'>
+    <oaf-form-section
+      heading-icon="fas.user"
+      heading-text="Author Information"
+      brand-color='pinot'
+      @form-save=${this._onFormSaveClick}
+      @form-toggle=${this._onFormSectionToggle}
+      >
       <div slot="read-only">
         <div ?hidden=${!this.data?.authorFullName} class='person-name'>${this.data?.authorFullName || ''}</div>
         <div class='dot-container'>
@@ -106,6 +114,9 @@ function _renderAuthorInfo() {
           <div class='primary bold'>Other Authors</div>
           <div class='small'>${this.data?.otherAuthors}</div>
         </div>
+      </div>
+      <div slot="form">
+        ${submissionFields.authorInfo.call(this, true)}
       </div>
     </oaf-form-section>
   `;

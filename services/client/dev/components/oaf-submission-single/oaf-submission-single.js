@@ -17,7 +17,8 @@ export default class OafSubmissionSingle extends Mixin(LitElement)
       data: {state: true},
       displayTitle: {state: true},
       fundAccountString: {state: true},
-      noScrollOnUpdate: { state: true }
+      noScrollOnUpdate: { state: true },
+      payload: { state: true }
     }
   }
 
@@ -34,6 +35,8 @@ export default class OafSubmissionSingle extends Mixin(LitElement)
     this.appComponentController = new AppComponentController(this);
     this.scrollCtl = new ScrollController(this);
     this.noScrollOnUpdate = false;
+
+    this.payload = {};
 
     this._injectModel('AppStateModel', 'SubmissionModel');
   }
@@ -68,6 +71,7 @@ export default class OafSubmissionSingle extends Mixin(LitElement)
   async _onAppStateUpdate(e) {
     if ( !this.appComponentController.isOnActivePage ) return;
     this.submissionId = e.location.path[1];
+    this.payload = {};
 
     // for breadcrumb link back to submission list
     if ( e.lastPage === 'home') {
@@ -98,6 +102,52 @@ export default class OafSubmissionSingle extends Mixin(LitElement)
   _onSubmissionCommentupdateUpdate(e){
     if ( e.state !== 'loaded' ) return;
     this.noScrollOnUpdate = true;
+  }
+
+  /**
+   * @description Handles input events from the form
+   * @param {*} prop - The property name
+   * @param {*} value - The new value
+   */
+  _onInput(prop, value){
+    if ( prop === 'fundAccount' ){
+      if ( !value ){
+        this.payload[prop] = null;
+        this.selectedFundType = null;
+      } else {
+        this.payload[prop] = {
+          fundType: value.value,
+          parts: {}
+        }
+        this.selectedFundType = value;
+      }
+    } else {
+      this.payload[prop] = value;
+    }
+
+    this.requestUpdate();
+  }
+
+  async _onFormSectionToggle(e){
+    for ( const field of e.detail.fieldPaths ){
+      if ( !field ) continue;
+      const topProp = field.split('.')[0];
+      this.payload[topProp] = e.detail.showForm ? this.data[topProp] : null;
+    }
+    this.requestUpdate();
+  }
+
+  async _onFormSaveClick(e){
+    const payload = {};
+    for ( const field of e.detail.fieldPaths ){
+      if ( !field ) continue;
+      const topProp = field.split('.')[0];
+      if ( this.payload[topProp] === undefined || this.payload[topProp] === null ) continue;
+      payload[topProp] = this.payload[topProp];
+    }
+
+    const r = await this.SubmissionModel.patch(this.submissionId, payload);
+    console.log(r);
   }
 
 }

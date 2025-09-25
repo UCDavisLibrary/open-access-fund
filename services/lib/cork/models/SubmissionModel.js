@@ -64,6 +64,15 @@ class SubmissionModel extends BaseModel {
     return r;
   }
 
+  async patch(id, data) {
+    const r = await this.service.patch(id, data);
+    this.ValidationModel.notify('submission', r);
+    if ( r?.state === 'loaded' ){
+      this.clearCache();
+    }
+    return r;
+  }
+
   clearCache(){
     this.store.data.get.purge();
     this.store.data.query.purge();

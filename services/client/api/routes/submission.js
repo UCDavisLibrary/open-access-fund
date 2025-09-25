@@ -155,4 +155,8 @@ export default (app) => {
       client.release();
     }
   });
+
+  app.patch('/submission/:id', protect('hasWriteAccess'), validate(schema.submissionPatch), async (req, res) => {
+    return res.status(200).json({ message: 'Not implemented' });
+  });
 };

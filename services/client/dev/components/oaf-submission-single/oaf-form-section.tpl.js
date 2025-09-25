@@ -70,7 +70,7 @@ export function render() {
         <div class='panel__title heading-text'>${this.headingText}</div>
       </div>
       <cork-icon-button
-        @click=${() => this.showForm = !this.showForm}
+        @click=${this._onEditClick}
         title=${this.showForm ? 'Cancel Edit' : 'Edit Data'}
         ?hidden=${!this.AuthModel.userHasWriteAccess || this.disableFormView}
         icon='${this.showForm ? "fas.xmark" : "fas.pen-to-square"}'>

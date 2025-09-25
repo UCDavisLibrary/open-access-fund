@@ -8,6 +8,7 @@ import headings from './headings.css';
 // if done in the element itself, it creates a style tag for each instance
 import { styles as oafStatusSubnavStyles } from '../components/oaf-status-subnav.tpl.js';
 import { styles as corkFieldContainerStyles } from '../components/cork-field-container.tpl.js';
+import submissionFieldsStyles from './submissionFields.css.js';
 
 function getLitStyles(styles){
   return styles().map(s => s.cssText).join('\n');
@@ -30,6 +31,7 @@ const styles = `
   ${headings}
   ${getLitStyles(oafStatusSubnavStyles)}
   ${getLitStyles(corkFieldContainerStyles)}
+  ${getLitStyles(submissionFieldsStyles)}
 `;
 
 let sharedStyleElement = document.createElement('style');

@@ -3,7 +3,7 @@ import { requiredString, requiredNumber } from "./utils.js";
 import fundAccountSchema from "./fundAccount.js";
 import { DataDefinitions } from "../../../../../lib/utils/DataDefinitions.js";
 
-const submissionSchema = z
+export const submissionObject = z
   .object({
     authorLastName: requiredString().pipe(z.string().max(250)),
     authorFirstName: requiredString().pipe(z.string().max(250)),
@@ -27,7 +27,9 @@ const submissionSchema = z
     articleStatus: requiredString().pipe(z.enum(DataDefinitions.ARTICLE_STATUSES.map(s => s.value))),
     articleLink: z.string().trim().url().max(2000).optional(),
     authorComment: z.string().max(2000).optional()
-  })
+  });
+
+const submissionSchema = submissionObject
   .superRefine((data, ctx) => {
 
     // if affiliation is other, otherAffiliation is required

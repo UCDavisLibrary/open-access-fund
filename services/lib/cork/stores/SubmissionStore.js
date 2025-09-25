@@ -14,7 +14,8 @@ class SubmissionStore extends BaseStore {
       get: new LruStore({name: 'submission.get'}),
       commentCreate: new LruStore({name: 'submission.commentCreate'}),
       commentUpdate: new LruStore({name: 'submission.commentUpdate'}),
-      statusUpdate: new LruStore({name: 'submission.statusUpdate'})
+      statusUpdate: new LruStore({name: 'submission.statusUpdate'}),
+      patch: new LruStore({name: 'submission.patch'})
     };
     this.events = {};
 
@@ -41,6 +42,10 @@ class SubmissionStore extends BaseStore {
       },
       'submission.statusUpdate': {
         message: 'Unable to update submission status',
+        showToast: true
+      },
+      'submission.patch': {
+        message: 'Unable to update submission',
         showToast: true
       }
     }

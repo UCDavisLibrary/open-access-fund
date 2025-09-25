@@ -50,8 +50,38 @@ export default class OafFormSection extends Mixin(LitElement)
   }
 
   _onSaveClick() {
-    this.emit( new CustomEvent('form-save', {bubbles: true, composed: true}) );
+    this.dispatchEvent(
+      new CustomEvent('form-save', {
+        bubbles: true,
+        composed: true,
+        detail: {fieldPaths: this.getFieldPaths() }
+      })
+    );
   }
+
+  _onEditClick() {
+    this.showForm = !this.showForm;
+    this.dispatchEvent(
+      new CustomEvent('form-toggle', {
+        bubbles: true,
+        composed: true,
+        detail: { showForm: this.showForm, fieldPaths: this.getFieldPaths() }
+      })
+    );
+  }
+
+  getFieldPaths(){
+    const paths = [];
+    const slot = this.renderRoot.querySelector('slot[name=form]')?.assignedElements()[0];
+    if ( !slot ) return paths;
+
+    for ( const field of slot.querySelectorAll('cork-field-container') ){
+      paths.push(field.path);
+    }
+    return paths;
+  }
+
+
 
 
 
