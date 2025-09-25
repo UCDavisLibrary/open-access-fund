@@ -166,6 +166,152 @@ class Submission {
     if ( r.error ) return r;
     return { res: r.res.rows?.[0]?.count === 1 };
   }
+
+  async update(submissionId, data, userData, client ){
+    let isDedicatedClient = false;
+    try {
+      if ( !client ) {
+        isDedicatedClient = true;
+        client = await pgClient.pool.connect();
+        await client.query('BEGIN');
+      }
+
+      // get original submission data
+      let existingValues = await client.query(
+        `SELECT * FROM ${config.db.tables.submission} WHERE submission_id=$1`,
+        [submissionId]
+      );
+      if ( !existingValues.rowCount ) {
+        throw new Error('Submission not found');
+      }
+      existingValues = existingValues.rows[0];
+
+      // write to submission table
+      const d = pgClient.prepareObjectForUpdate(data);
+      const sql = `UPDATE ${config.db.tables.submission} SET ${d.sql} WHERE submission_id=$${d.values.length + 1}`;
+      await client.query(sql, [...d.values, submissionId]);
+
+      // update user, if provided
+      let userId;
+      if ( userData ){
+        userId = await models.user.upsert(userData, client);
+      }
+
+      // write transactions if any values changed
+      for ( const field of Object.keys(data) ) {
+        let previousValue = existingValues[field];
+        let newValue = data[field];
+
+        if ( field === 'fund_account' ){
+          // todo: compare fund account objects
+          continue;
+        }
+        if ( newValue != previousValue ) {
+          const submissionTransactionData = {
+            submission_id: submissionId,
+            transaction_type: 'field-update',
+            transaction_subtype: field,
+            app_user_id: userId,
+            details: {
+              previousValue,
+              newValue
+            }
+          };
+          await models.submissionTransaction.create(submissionTransactionData, client);
+        }
+      }
+
+      if ( isDedicatedClient ) {
+        await client.query('COMMIT');
+      }
+
+      return { res: { success: true } };
+    } catch (error) {
+      if ( isDedicatedClient ) {
+        await client.query('ROLLBACK');
+        return { error };
+      } else {
+        throw error;
+      }
+    } finally {
+      if ( isDedicatedClient ) {
+        client.release();
+      }
+    }
+  }
+
+  async updateStatus(submissionId, newStatus, userData, comment, client ){
+    let isDedicatedClient = false;
+    let r;
+    try {
+      if ( !client ) {
+        isDedicatedClient = true;
+        client = await pgClient.pool.connect();
+        await client.query('BEGIN');
+      }
+
+      // get original submission data
+      let ogSubmission = await this.get(submissionId);
+      if ( ogSubmission.error ) {
+        throw ogSubmission.error;
+      }
+      ogSubmission = ogSubmission.res;
+      if ( !ogSubmission ) {
+        throw new Error('Submission not found');
+      }
+
+      // write comment, if provided.
+      let commentId;
+      if ( comment ) {
+        r = await models.comment.create(
+          {submission_id: submissionId, comment_text: comment},
+          userData,
+          true,
+          client
+        );
+        if ( r.error ) throw r.error;
+        commentId = r.res.userCommentId;
+      }
+
+      // update user, if provided
+      let userId;
+      if ( userData ){
+        userId = await models.user.upsert(userData, client);
+      }
+
+      // update submission status
+      const sql = `UPDATE ${config.db.tables.submission} SET submission_status_id=get_submission_status_id($1) WHERE submission_id=$2`;
+      r = await client.query(sql, [newStatus, submissionId]);
+
+      // write submission transaction
+      const submissionTransactionData = {
+        submission_id: submissionId,
+        transaction_type: 'status-update',
+        app_user_id: userId,
+        transaction_subtype: newStatus,
+        user_comment_id: commentId,
+        previous_status: ogSubmission.status?.statusId || null
+      };
+      await models.submissionTransaction.create(submissionTransactionData, client);
+
+      if ( isDedicatedClient ) {
+        await client.query('COMMIT');
+      }
+
+      return { res: { success: true } };
+    } catch (error) {
+      if ( isDedicatedClient ) {
+        await client.query('ROLLBACK');
+        return { error };
+      } else {
+        throw error;
+      }
+    } finally {
+      if ( isDedicatedClient ) {
+        client.release();
+      }
+    }
+  }
 }
 
 

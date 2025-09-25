@@ -110,19 +110,49 @@ export default (app) => {
   });
 
   app.post('/submission/:id/status', protect('hasWriteAccess'), validate(schema.statusUpdate), async (req, res) => {
+    let client
     try {
-      // checkout client
+      client = await pgClient.pool.connect();
+      await client.query('BEGIN');
 
-      // status update with transaction
+      const submissionId = req.validated.id;
 
-      // write comment, if provided. no transaction log needed, as it's part of status update transaction
+      // update status
+      await models.submission.updateStatus(
+        submissionId,
+        req.validated.status,
+        req.auth.token.dbUpsertObject,
+        req.validated.comment,
+        client
+      );
 
-      // update non-status submission properties, if provided (award amount, accounting system number) with transactions
+      // update relevant non-status submission properties, if provided
+      let status = await models.submissionStatus.getByNameOrId(req.validated.status);
+      if ( status.error ) {
+        throw status.error;
+      }
+      status = status.res;
+      const submissionUpdateData = {};
+      if ( req.validated.awardAmount && ['completed', 'accounting'].includes(status.name) ) {
+        submissionUpdateData.award_amount = req.validated.awardAmount;
+      }
+      if ( req.validated.accountingSystemNumber && status.name === 'completed' ) {
+        submissionUpdateData.accounting_system_number = req.validated.accountingSystemNumber;
+      }
+      if ( Object.keys(submissionUpdateData).length ) {
+        await models.submission.update(submissionId, submissionUpdateData, req.auth.token.dbUpsertObject, client);
+      }
 
-      // send email, if not disabled
+      // TODO: send email, if not disabled
+
+      await client.query('COMMIT');
+
       return res.status(200).json({ message: 'Not implemented' });
     } catch(e){
+      await client.query('ROLLBACK');
       return handleError(res, req, e);
+    } finally {
+      client.release();
     }
   });
 };

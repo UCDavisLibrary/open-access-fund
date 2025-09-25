@@ -90,7 +90,7 @@ export function renderUpdateForm(){
       <label for=${idGen.get('comment')}>Comment (optional)</label>
       <textarea id=${idGen.get('comment')} .value=${this.payload.comment || ''} @input=${e => this._onPayloadInput('comment', e.target.value)} rows="4" ></textarea>
     </cork-field-container>
-    <div ?hidden=${this.payload.status !== 'completed'}>
+    <div ?hidden=${!['completed', 'accounting'].includes(this.payload.status)}>
       <cork-field-container schema='status' path='awardAmount' class='field-container'>
         <label for=${idGen.get('awardAmount')}>Award Amount</label>
         <input
@@ -99,6 +99,8 @@ export function renderUpdateForm(){
           inputmode='decimal'
           @input=${e => this._onPayloadInput('awardAmount', e.target.value)}>
       </cork-field-container>
+    </div>
+    <div ?hidden=${this.payload.status !== 'completed'}>
       <cork-field-container schema='status' path='accountingSystemNumber' class='field-container'>
         <label for=${idGen.get('accountingSystemNumber')}>Accounting System Number</label>
         <input

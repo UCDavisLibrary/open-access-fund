@@ -38,6 +38,19 @@ class SubmissionStatus {
     this.nameToId[name] = result.res.rows[0].get_submission_status_id;
     return { res: this.nameToId[name] };
   }
+
+  async getByNameOrId(nameOrId){
+    let id = await this.getIdByName(nameOrId);
+    if ( id.error ) return id;
+    if ( !id.res ) {
+      return { res: null };
+    }
+    id = id.res;
+    const sql = `SELECT * FROM ${config.db.tables.submissionStatus} WHERE status_id = $1`;
+    const r = await pgClient.query(sql, [id]);
+    if ( r.error ) return r;
+    return { res: r.res.rows[0] };
+  }
 }
 
 

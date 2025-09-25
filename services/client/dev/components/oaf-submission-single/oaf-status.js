@@ -98,7 +98,12 @@ export default class OafStatus extends Mixin(LitElement)
       return;
     }
     if ( r.state === 'loaded' ) {
-      console.log('nice!');
+      this.AppStateModel.showToast({
+        text: 'Submission status updated',
+        type: 'success',
+        showOnPageLoad: true
+      });
+      this.AppStateModel.refresh();
     }
   }
 

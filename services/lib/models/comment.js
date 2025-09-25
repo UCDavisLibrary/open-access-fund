@@ -5,12 +5,10 @@ import models from './index.js';
 class Comment {
   async create(commentData, userData, noTransaction, client) {
     let isDedicatedClient = false;
-    if ( !client ) {
-      isDedicatedClient = true;
-      client = await pgClient.pool.connect();
-    }
     try {
-      if ( isDedicatedClient ) {
+      if ( !client ) {
+        isDedicatedClient = true;
+        client = await pgClient.pool.connect();
         await client.query('BEGIN');
       }
 
@@ -30,7 +28,7 @@ class Comment {
       const userCommentId = result.rows[0].user_comment_id;
 
       // transaction log
-        if ( !noTransaction ) {
+      if ( !noTransaction ) {
         const transactionData = {
           submission_id: commentData.submission_id,
           transaction_type: 'comment',
@@ -62,12 +60,11 @@ class Comment {
 
   async update(commentId, commentText, client) {
     let isDedicatedClient = false;
-    if ( !client ) {
-      isDedicatedClient = true;
-      client = await pgClient.pool.connect();
-    }
+
     try {
-      if ( isDedicatedClient ) {
+      if ( !client ) {
+        isDedicatedClient = true;
+        client = await pgClient.pool.connect();
         await client.query('BEGIN');
       }
 
